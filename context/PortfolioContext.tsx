@@ -1,11 +1,9 @@
-// context/PortfolioContext.tsx
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { toast } from "sonner";
 import { updatePortfolioData, triggerRevalidation } from "../lib/portfolio-api";
 
-// Keep your existing PortfolioData interface
 export interface PortfolioData {
   theme: {
     styles: {
@@ -80,9 +78,7 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
     setLoading(true);
     setError(null);
     try {
-      // Trigger a page revalidation instead of client-side fetch
       await triggerRevalidation();
-      // Refresh the page to get updated data
       window.location.reload();
     } catch (e) {
       setError("Failed to refresh portfolio data");
@@ -97,7 +93,6 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
       // Update via API
       await updatePortfolioData(newData);
       
-      // Update local state immediately for better UX
       const updated: PortfolioData = {
         ...data,
         ...newData,
@@ -138,7 +133,6 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
       
       root.classList.toggle("dark", theme.currentMode === "dark");
       
-      // Smooth transition
       root.style.transition = 'background-color 0.3s ease, color 0.3s ease';
       
     } catch (error) {
@@ -148,7 +142,7 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const adminEmail = "admin@portfolio.com";
+    const adminEmail = "admin@example.com";
     const adminPassword = "admin123";
     
     if (email === adminEmail && password === adminPassword) {

@@ -1,10 +1,8 @@
-// app/api/revalidate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check for secret to confirm this is a valid request
     const secret = request.nextUrl.searchParams.get('secret');
     
     if (secret !== process.env.REVALIDATION_SECRET) {
@@ -15,7 +13,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
     const path = body.path || '/';
     
-    // This will clear the cache and regenerate the page
     revalidatePath(path);
     
     return NextResponse.json({ 
@@ -31,7 +28,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Optional: Allow GET requests with query params
+// Allow GET requests with query params
 export async function GET(request: NextRequest) {
   try {
     const secret = request.nextUrl.searchParams.get('secret');

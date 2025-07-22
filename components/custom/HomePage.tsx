@@ -6,13 +6,11 @@ import { PortfolioData, PortfolioProvider } from '../../context/PortfolioContext
 import ThemeTestPage from './page-content';
 
 
-interface HomePageProps {
-  data: PortfolioData;
-}
 
-export default function HomePage({ data }: HomePageProps) {
+
+export default function HomePage() {
   return (
-    <PortfolioProvider initialData={data}>
+    // <PortfolioProvider initialData={data}>
       <div className="min-h-screen bg-background text-foreground">
         <ThemeTestPage />
         {/* <HeroSection />
@@ -22,6 +20,6 @@ export default function HomePage({ data }: HomePageProps) {
         <SkillsSection />
         <ContactSection /> */}
       </div>
-    </PortfolioProvider>
+    // </PortfolioProvider>
   );
 }
