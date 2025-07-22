@@ -1,11 +1,14 @@
 'use client'
 import React, { useState } from 'react';
 import { Star, Heart, MessageCircle, Share2, Settings, User, Bell, Search, ChevronRight, Calendar, MapPin } from 'lucide-react';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 const ThemeTestPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [notifications, setNotifications] = useState(3);
+
+  const {data} =usePortfolio();
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle('dark');
@@ -16,7 +19,7 @@ const ThemeTestPage = () => {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary">Theme Test</h1>
+          <h1 className="text-2xl font-bold text-primary">{data.hero.heading}</h1>
           <div className="flex items-center gap-4">
             <button 
               onClick={toggleTheme}
