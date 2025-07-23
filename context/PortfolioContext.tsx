@@ -12,14 +12,22 @@ export interface PortfolioData {
     };
     currentMode: "light" | "dark";
   };
+  sectionOrder: {
+    hero: number;
+    about: number;
+    projects: number;
+    experience: number;
+    education: number;
+    contacts: number;
+  };
   hero: {
     heading: string;
     subheading: string;
     cta: string;
     image: string;
   };
-  about: { 
-    markdown: string; 
+  about: {
+    markdown: string;
   };
   projects: Array<{
     id: string;
@@ -29,6 +37,13 @@ export interface PortfolioData {
     link?: string;
     github?: string;
     image: string;
+  }>;
+  education: Array<{
+    id: string;
+    institution: string;
+    degree: string;
+    year: string;
+    description: string;
   }>;
   experience: Array<{
     id: string;
@@ -54,7 +69,7 @@ interface PortfolioContextType {
   data: PortfolioData;
   loading: boolean;
   error: string | null;
-  updateData: (newData: Partial<PortfolioData>) => Promise<void>;
+  updateData: (currentData: PortfolioData, newData: Partial<PortfolioData>) => Promise<void>;
   refreshData: () => Promise<void>;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
@@ -87,12 +102,12 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
     }
   };
 
-  const updateData = async (newData: Partial<PortfolioData>) => {
+  const updateData = async (currentData: PortfolioData, newData: Partial<PortfolioData>): Promise<void> => {
     setLoading(true);
     try {
       // Update via API
-      await updatePortfolioData(newData);
-      
+      await updatePortfolioData(currentData, newData);
+
       const updated: PortfolioData = {
         ...data,
         ...newData,
@@ -107,10 +122,10 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
           },
         }),
       };
-      
+
       setData(updated);
       if (newData.theme) applyTheme(updated.theme);
-      
+
       toast.success("Portfolio updated successfully!");
     } catch (err) {
       toast.error("Failed to update portfolio");
@@ -122,19 +137,19 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
 
   const applyTheme = (theme: PortfolioData["theme"]) => {
     if (typeof window === "undefined") return;
-    
+
     const root = document.documentElement;
     const modeStyles = theme.styles[theme.currentMode];
-    
+
     try {
       Object.entries(modeStyles).forEach(([key, val]) => {
         root.style.setProperty(`--${key}`, val.trim());
       });
-      
+
       root.classList.toggle("dark", theme.currentMode === "dark");
-      
+
       root.style.transition = 'background-color 0.3s ease, color 0.3s ease';
-      
+
     } catch (error) {
       console.error("Error applying theme:", error);
       root.classList.toggle("dark", theme.currentMode === "dark");
@@ -144,7 +159,7 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
   const login = async (email: string, password: string): Promise<boolean> => {
     const adminEmail = "admin@example.com";
     const adminPassword = "admin123";
-    
+
     if (email === adminEmail && password === adminPassword) {
       setIsAuthenticated(true);
       return true;
@@ -173,15 +188,15 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
 
   return (
     <PortfolioContext.Provider
-      value={{ 
-        data, 
-        loading, 
-        error, 
-        updateData, 
-        refreshData, 
-        isAuthenticated, 
-        login, 
-        logout 
+      value={{
+        data,
+        loading,
+        error,
+        updateData,
+        refreshData,
+        isAuthenticated,
+        login,
+        logout
       }}
     >
       {children}

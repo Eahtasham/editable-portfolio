@@ -9,7 +9,7 @@ import { cache } from 'react';
 const inter = Inter({ subsets: ['latin'] });
 
 
-export const revalidate = 86400;; // Revalidate every day
+export const revalidate = 10;; // Revalidate every day
 
 const getCachedPortfolioData = cache(async () => {
   try {

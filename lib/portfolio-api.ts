@@ -49,6 +49,14 @@ const defaultData: PortfolioData = {
     },
     currentMode: "dark",
   },
+  sectionOrder: {
+    hero: 1,
+    about: 2,
+    projects: 3,
+    experience: 4,
+    education: 5,
+    contacts: 6
+  },
   hero: {
     heading: "Hi, I'm Eahtasham",
     subheading: "Full Stack Developer & UI/UX Designer",
@@ -67,6 +75,15 @@ const defaultData: PortfolioData = {
       link: "https://example.com",
       github: "https://github.com/example",
       image: "/placeholder.svg?height=300&width=400",
+    },
+  ],
+  education: [
+    {
+      id: "1",
+      institution: "University of Example",
+      degree: "Bachelor of Science in Computer Science",
+      year: "2020 - 2024",
+      description: "Graduated with honors",
     },
   ],
   experience: [
@@ -94,23 +111,24 @@ const defaultData: PortfolioData = {
 export async function fetchPortfolioData(): Promise<PortfolioData> {
   try {
     console.log('Fetching portfolio data...');
-    
+
     const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-      headers: { 
+      headers: {
         "X-Master-Key": API_KEY,
       },
       // Important for ISR: Don't cache this request
       next: { revalidate: 0 }
     });
-    
+
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
-    
+
     const result = await res.json();
     console.log('Portfolio data fetched successfully');
-    
+
     return result.record || defaultData;
+    // return defaultData;
   } catch (error) {
     console.error('Error fetching portfolio data:', error);
     console.log('Falling back to default data');
@@ -134,10 +152,43 @@ ${cssVariables}
   `;
 }
 
-// Client-side API functions for admin updates
-export async function updatePortfolioData(newData: Partial<PortfolioData>): Promise<void> {
-  const currentData = await fetchPortfolioData();
-  
+// // Client-side API functions for admin updates
+// export async function updatePortfolioData(newData: Partial<PortfolioData>): Promise<void> {
+//   const currentData = await fetchPortfolioData();
+
+//   const updated: PortfolioData = {
+//     ...currentData,
+//     ...newData,
+//     ...(newData.theme && {
+//       theme: {
+//         ...currentData.theme,
+//         ...newData.theme,
+//         styles: {
+//           ...currentData.theme.styles,
+//           ...newData.theme.styles,
+//         },
+//       },
+//     }),
+//   };
+
+//   const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+//     method: "PUT",
+//     headers: {
+//       "Content-Type": "application/json",
+//       "X-Master-Key": API_KEY,
+//     },
+//     body: JSON.stringify(updated),
+//   });
+
+//   if (!res.ok) {
+//     throw new Error(`Update failed: ${res.status}`);
+//   }
+
+//   // Trigger revalidation
+//   await triggerRevalidation();
+// }
+
+export async function updatePortfolioData(currentData: PortfolioData, newData: Partial<PortfolioData>): Promise<void> {
   const updated: PortfolioData = {
     ...currentData,
     ...newData,
@@ -161,12 +212,11 @@ export async function updatePortfolioData(newData: Partial<PortfolioData>): Prom
     },
     body: JSON.stringify(updated),
   });
-  
+
   if (!res.ok) {
     throw new Error(`Update failed: ${res.status}`);
   }
 
-  // Trigger revalidation
   await triggerRevalidation();
 }
 
