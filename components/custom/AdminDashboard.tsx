@@ -90,11 +90,11 @@ export default function AdminDashboard() {
         contacts: 6
     });
 
-    // useEffect(() => {
-    //     if (!isAuthenticated) {
-    //         router.push('/admin/login');
-    //     }
-    // }, [isAuthenticated]);
+    useEffect(() => {
+        if (!isAuthenticated) {
+            router.push('/admin/login');
+        }
+    }, [isAuthenticated]);
 
     useEffect(() => {
         if (portfolioData) {
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
         }
     };
 
-    const updateField = (path: string[], value: any) => {
+    const updateField = (path: string[], value: unknown) => {
         if (!editedData) return;
         
         const newData = JSON.parse(JSON.stringify(editedData));
@@ -823,7 +823,7 @@ export default function AdminDashboard() {
                                     <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <CardTitle>Theme Settings</CardTitle>
-                                            <CardDescription>Customize your portfolio's colors and appearance</CardDescription>
+                                            <CardDescription>Customize theme, colors and appearance</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-6">
                                             <div className="space-y-2">
