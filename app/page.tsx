@@ -1,9 +1,14 @@
-import Image from "next/image";
+import { PortfolioProvider } from '@/context/PortfolioContext';
+import HomePage from '../components/custom/HomePage';
+import { fetchPortfolioData, generateThemeCSS } from '../lib/portfolio-api';
 
-export default function Home() {
+// export const revalidate = 60;
+
+export default async function Page() {
+
   return (
-    <div>
-      Hello World
-    </div>
+    <>
+      <HomePage />
+    </>
   );
 }
