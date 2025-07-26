@@ -16,67 +16,101 @@ import { Loader2, Save, Plus, Trash2, User, Briefcase, FolderOpen, Mail, Palette
 import { updatePortfolioData } from '../../lib/portfolio-api';
 import { PortfolioData } from '../../context/PortfolioContext';
 import { toast } from 'sonner';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { oklch, formatHex, converter } from 'culori';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 // Color conversion utilities using culori
 const hexToOklch = (hex: string): string => {
-  try {
-    const toOklch = converter('oklch');
-    const oklchColor = toOklch(hex);
-    
-    if (!oklchColor) return 'oklch(0% 0 0)';
-    
-    const l = Math.round(oklchColor.l * 100);
-    const c = Math.round(oklchColor.c * 1000) / 1000;
-    const h = Math.round(oklchColor.h || 0);
-    
-    return `oklch(${l}% ${c} ${h})`;
-  } catch (error) {
-    console.error('Error converting hex to oklch:', error);
-    return 'oklch(0% 0 0)';
-  }
+    try {
+        const toOklch = converter('oklch');
+        const oklchColor = toOklch(hex);
+
+        if (!oklchColor) return 'oklch(0% 0 0)';
+
+        const l = Math.round(oklchColor.l * 100);
+        const c = Math.round(oklchColor.c * 1000) / 1000;
+        const h = Math.round(oklchColor.h || 0);
+
+        return `oklch(${l}% ${c} ${h})`;
+    } catch (error) {
+        console.error('Error converting hex to oklch:', error);
+        return 'oklch(0% 0 0)';
+    }
 };
 
 const oklchToHex = (oklchString: string): string => {
-  try {
-    // Parse the oklch string
-    const match = oklchString.match(/oklch\(([^%]+)%?\s+([^\s]+)\s+([^)]+)\)/);
-    if (!match) return '#000000';
-    
-    const l = parseFloat(match[1]) / 100;
-    const c = parseFloat(match[2]);
-    const h = parseFloat(match[3]);
+    try {
+        // Parse the oklch string
+        const match = oklchString.match(/oklch\(([^%]+)%?\s+([^\s]+)\s+([^)]+)\)/);
+        if (!match) return '#000000';
+
+        const l = parseFloat(match[1]) / 100;
+        const c = parseFloat(match[2]);
+        const h = parseFloat(match[3]);
 
         const oklchColor = {
-      mode: 'oklch' as const,
-      l: l,
-      c: c,
-      h: h
-    };
-    
-    // Create oklch color object and convert to hex
-    const hexColor = formatHex(oklchColor);
-    return hexColor || '#000000';
-  } catch (error) {
-    console.error('Error converting oklch to hex:', error);
-    return '#000000';
-  }
+            mode: 'oklch' as const,
+            l: l,
+            c: c,
+            h: h
+        };
+
+        // Create oklch color object and convert to hex
+        const hexColor = formatHex(oklchColor);
+        return hexColor || '#000000';
+    } catch (error) {
+        console.error('Error converting oklch to hex:', error);
+        return '#000000';
+    }
 };
 
 
 interface SectionOrder {
-  hero: number;
-  about: number;
-  projects: number;
-  experience: number;
-  education: number;
-  contacts: number;
+    hero: number;
+    about: number;
+    projects: number;
+    experience: number;
+    education: number;
+    contacts: number;
 }
+
+interface SortableItemProps {
+    id: string;
+    section: string;
+    order: number;
+}
+
+const SortableItem: React.FC<SortableItemProps> = ({ id, section, order }) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            className="flex items-center justify-between p-3 border border-border rounded-lg bg-card"
+        >
+            <div className="flex items-center gap-3">
+                <GripVertical className="h-4 w-4 text-muted-foreground" />
+                <span className="capitalize font-medium">{section}</span>
+            </div>
+            <span className="text-sm text-muted-foreground">Position {order}</span>
+        </div>
+    );
+};
 
 export default function AdminDashboard() {
     const { isAuthenticated, data: portfolioData, refreshData } = usePortfolio();
     const router = useRouter();
-    
+
     const [editedData, setEditedData] = useState<PortfolioData | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
@@ -89,6 +123,7 @@ export default function AdminDashboard() {
         education: 5,
         contacts: 6
     });
+    const [selectedThemeMode, setSelectedThemeMode] = useState<'light' | 'dark'>('dark');
 
     // useEffect(() => {
     //     if (!isAuthenticated) {
@@ -96,26 +131,24 @@ export default function AdminDashboard() {
     //     }
     // }, [isAuthenticated]);
 
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
     useEffect(() => {
         if (portfolioData) {
             const data = JSON.parse(JSON.stringify(portfolioData));
-            // Add education if it doesn't exist
-            if (!data.education) {
-                data.education = [];
-            }
-            // Add sectionOrder if it doesn't exist
-            if (!data.sectionOrder) {
-                data.sectionOrder = sectionOrder;
-            } else {
-                setSectionOrder(data.sectionOrder);
-            }
+            setSectionOrder(data.sectionOrder);
             setEditedData(data);
         }
     }, [portfolioData]);
 
     const handleSave = async () => {
         if (!editedData || !portfolioData) return;
-        
+
         setIsLoading(true);
         try {
             await updatePortfolioData(portfolioData, { ...editedData, sectionOrder });
@@ -132,14 +165,14 @@ export default function AdminDashboard() {
 
     const updateField = (path: string[], value: unknown) => {
         if (!editedData) return;
-        
+
         const newData = JSON.parse(JSON.stringify(editedData));
         let current = newData;
-        
+
         for (let i = 0; i < path.length - 1; i++) {
             current = current[path[i]];
         }
-        
+
         current[path[path.length - 1]] = value;
         setEditedData(newData);
         setIsDirty(true);
@@ -229,6 +262,26 @@ export default function AdminDashboard() {
         updateField(['skills', category], editedData.skills[category].filter(s => s !== skill));
     };
 
+    const handleDragEnd = (event: any) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        const items = Object.entries(sectionOrder).sort(([, a], [, b]) => a - b);
+        const oldIndex = items.findIndex(([section]) => section === active.id);
+        const newIndex = items.findIndex(([section]) => section === over.id);
+        const newItems = [...items];
+        const [movedItem] = newItems.splice(oldIndex, 1);
+        newItems.splice(newIndex, 0, movedItem);
+
+        const newOrder = newItems.reduce((acc, [section], index) => ({
+            ...acc,
+            [section]: index + 1,
+        }), {} as SectionOrder);
+
+        setSectionOrder(newOrder);
+        setIsDirty(true);
+    };
+
     if (!editedData) {
         return (
             <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
@@ -245,8 +298,8 @@ export default function AdminDashboard() {
                         <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Admin Dashboard</h1>
                         <p className="text-muted-foreground">Manage your portfolio content</p>
                     </div>
-                    <Button 
-                        onClick={handleSave} 
+                    <Button
+                        onClick={handleSave}
                         disabled={!isDirty || isLoading}
                         className="bg-primary text-primary-foreground hover:bg-primary/90 w-full lg:w-auto"
                     >
@@ -264,12 +317,16 @@ export default function AdminDashboard() {
                     </Button>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                <div className="w-full">
                     {/* Main Content */}
                     <div className="xl:col-span-3">
                         <Tabs defaultValue="hero" className="space-y-4">
                             <div className="overflow-x-auto">
-                                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 bg-muted min-w-max">
+                                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 bg-muted min-w-max">
+                                    <TabsTrigger value="ordering" className="flex items-center gap-1">
+                                        <GripVertical className="h-4 w-4" />
+                                        Ordering
+                                    </TabsTrigger>
                                     <TabsTrigger value="hero" className="flex items-center gap-1 text-xs lg:text-sm">
                                         <User className="h-3 w-3 lg:h-4 lg:w-4" />
                                         <span className="hidden sm:inline">Hero</span>
@@ -294,12 +351,34 @@ export default function AdminDashboard() {
                                         <Mail className="h-3 w-3 lg:h-4 lg:w-4" />
                                         <span className="hidden sm:inline">Contacts</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="settings" className="flex items-center gap-1 text-xs lg:text-sm">
-                                        <Settings className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span className="hidden sm:inline">Settings</span>
+                                    <TabsTrigger value="theme" className="flex items-center gap-1">
+                                        <Palette className="h-4 w-4" />
+                                        Theme
                                     </TabsTrigger>
                                 </TabsList>
                             </div>
+
+                            <TabsContent value="ordering">
+                                <Card className="bg-card text-card-foreground border-border">
+                                    <CardHeader>
+                                        <CardTitle>Section Ordering</CardTitle>
+                                        <CardDescription>Drag and drop to reorder portfolio sections</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                                            <SortableContext items={Object.keys(sectionOrder)} strategy={verticalListSortingStrategy}>
+                                                <div className="space-y-2">
+                                                    {Object.entries(sectionOrder)
+                                                        .sort(([, a], [, b]) => a - b)
+                                                        .map(([section, order]) => (
+                                                            <SortableItem key={section} id={section} section={section} order={order} />
+                                                        ))}
+                                                </div>
+                                            </SortableContext>
+                                        </DndContext>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
 
                             {/* Hero Section */}
                             <TabsContent value="hero">
@@ -703,9 +782,9 @@ export default function AdminDashboard() {
                                                 className="bg-background border-input"
                                             />
                                         </div>
-                                        
+
                                         <Separator />
-                                        
+
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label htmlFor="contact-github">GitHub URL</Label>
@@ -743,7 +822,7 @@ export default function AdminDashboard() {
 
                                         <div className="space-y-4">
                                             <h4 className="text-sm font-medium">Skills</h4>
-                                            
+
                                             {(['frontend', 'backend', 'tools'] as const).map((category) => (
                                                 <div key={category} className="space-y-2">
                                                     <Label className="capitalize">{category}</Label>
@@ -780,65 +859,33 @@ export default function AdminDashboard() {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
-
-                            {/* Settings Section */}
-                            <TabsContent value="settings">
-                                <div className="space-y-6">
-                                    {/* Section Ordering */}
-                                    <Card className="bg-card text-card-foreground border-border">
-                                        <CardHeader>
-                                            <CardTitle>Section Order</CardTitle>
-                                            <CardDescription>Set the order in which sections appear on your portfolio</CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="space-y-4">
-                                            {Object.entries(sectionOrder)
-                                                .sort(([,a], [,b]) => a - b)
-                                                .map(([section, order]) => (
-                                                <div key={section} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <GripVertical className="h-4 w-4 text-muted-foreground" />
-                                                        <span className="capitalize font-medium">{section}</span>
-                                                    </div>
-                                                    <Select
-                                                        value={order.toString()}
-                                                        onValueChange={(value) => updateSectionOrder(section as keyof SectionOrder, parseInt(value))}
-                                                    >
-                                                        <SelectTrigger className="w-20">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {[1, 2, 3, 4, 5, 6].map((num) => (
-                                                                <SelectItem key={num} value={num.toString()}>
-                                                                    {num}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            ))}
-                                        </CardContent>
-                                    </Card>
-
-                                    {/* Theme Settings */}
+                            <TabsContent value="theme">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <CardTitle>Theme Settings</CardTitle>
-                                            <CardDescription>Customize theme, colors and appearance</CardDescription>
+                                            <CardDescription>Select a theme mode to customize colors</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-6">
                                             <div className="space-y-2">
-                                                <Label>Default Theme Mode</Label>
+                                                <Label>Theme Mode</Label>
                                                 <div className="flex gap-2">
                                                     <Button
-                                                        variant={editedData.theme.currentMode === 'light' ? 'default' : 'outline'}
-                                                        onClick={() => updateField(['theme', 'currentMode'], 'light')}
+                                                        variant={selectedThemeMode === 'light' ? 'default' : 'outline'}
+                                                        onClick={() => {
+                                                            setSelectedThemeMode('light');
+                                                            updateField(['theme', 'currentMode'], 'light');
+                                                        }}
                                                         size="sm"
                                                     >
                                                         Light
                                                     </Button>
                                                     <Button
-                                                        variant={editedData.theme.currentMode === 'dark' ? 'default' : 'outline'}
-                                                        onClick={() => updateField(['theme', 'currentMode'], 'dark')}
+                                                        variant={selectedThemeMode === 'dark' ? 'default' : 'outline'}
+                                                        onClick={() => {
+                                                            setSelectedThemeMode('dark');
+                                                            updateField(['theme', 'currentMode'], 'dark');
+                                                        }}
                                                         size="sm"
                                                     >
                                                         Dark
@@ -846,133 +893,710 @@ export default function AdminDashboard() {
                                                 </div>
                                             </div>
 
-                                            <Separator />
-
-                                            {(['light', 'dark'] as const).map((mode) => (
-                                                <div key={mode} className="space-y-4">
-                                                    <h4 className="text-lg font-semibold capitalize">{mode} Theme Colors</h4>
-                                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                                        {Object.entries(editedData.theme.styles[mode]).map(([colorKey, colorValue]) => (
-                                                            <div key={colorKey} className="space-y-2">
-                                                                <Label className="text-sm font-medium">
-                                                                    {colorKey.split('-').map(word => 
-                                                                        word.charAt(0).toUpperCase() + word.slice(1)
-                                                                    ).join(' ')}
-                                                                </Label>
-                                                                <div className="flex gap-2">
+                                            <Accordion type="single" collapsible className="w-full">
+                                                <AccordionItem value="primary-colors">
+                                                    <AccordionTrigger className="capitalize">Primary Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
                                                                     <input
                                                                         type="color"
-                                                                        value={oklchToHex(colorValue)}
-                                                                        onChange={(e) => updateColorField(['theme', 'styles', mode, colorKey], e.target.value)}
-                                                                        className="w-12 h-10 rounded border border-input cursor-pointer"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].primary)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'primary'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
                                                                     />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
                                                                     <Input
-                                                                        value={colorValue}
-                                                                        onChange={(e) => updateField(['theme', 'styles', mode, colorKey], e.target.value)}
-                                                                        className="bg-background border-input font-mono text-sm flex-1"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].primary)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'primary'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].primary}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'primary'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
                                                                         placeholder="oklch(50% 0.1 180)"
                                                                     />
                                                                 </div>
                                                             </div>
-                                                        ))}
-                                                    </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['primary-foreground'])}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'primary-foreground'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['primary-foreground'])}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'primary-foreground'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode]['primary-foreground']}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'primary-foreground'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                <AccordionItem value="secondary-colors">
+                                                    <AccordionTrigger className="capitalize">Secondary Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].secondary)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'secondary'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].secondary)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'secondary'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].secondary}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'secondary'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['secondary-foreground'])}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'secondary-foreground'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['secondary-foreground'])}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'secondary-foreground'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode]['secondary-foreground']}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'secondary-foreground'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                <AccordionItem value="background-colors">
+                                                    <AccordionTrigger className="capitalize">Background Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].background)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'background'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].background)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'background'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].background}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'background'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].foreground)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'foreground'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].foreground)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'foreground'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].foreground}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'foreground'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                <AccordionItem value="card-colors">
+                                                    <AccordionTrigger className="capitalize">Card Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].card)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'card'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].card)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'card'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].card}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'card'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['card-foreground'])}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'card-foreground'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['card-foreground'])}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'card-foreground'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode]['card-foreground']}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'card-foreground'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                <AccordionItem value="accent-colors">
+                                                    <AccordionTrigger className="capitalize">Accent Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].accent)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'accent'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].accent)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'accent'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].accent}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'accent'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['accent-foreground'])}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'accent-foreground'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['accent-foreground'])}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'accent-foreground'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode]['accent-foreground']}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'accent-foreground'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                <AccordionItem value="border-colors">
+                                                    <AccordionTrigger className="capitalize">Border Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].border)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'border'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].border)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'border'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].border}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'border'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].input)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'input'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].input)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'input'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].input}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'input'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                <AccordionItem value="destructive-colors">
+                                                    <AccordionTrigger className="capitalize">Destructive Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].destructive)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'destructive'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].destructive)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'destructive'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].destructive}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'destructive'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['destructive-foreground'])}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'destructive-foreground'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['destructive-foreground'])}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'destructive-foreground'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode]['destructive-foreground']}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'destructive-foreground'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                <AccordionItem value="muted-colors">
+                                                    <AccordionTrigger className="capitalize">Muted Colors</AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].muted)}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'muted'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode].muted)}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'muted'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode].muted}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'muted'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['muted-foreground'])}
+                                                                        onChange={(e) => updateColorField(['theme', 'styles', selectedThemeMode, 'muted-foreground'], e.target.value)}
+                                                                        className="w-full h-full rounded border border-input cursor-pointer"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>Hex</Label>
+                                                                    <Input
+                                                                        value={oklchToHex(editedData.theme.styles[selectedThemeMode]['muted-foreground'])}
+                                                                        onChange={(e) => {
+                                                                            const hex = e.target.value;
+                                                                            if (/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{6}){1,2}$/.test(hex)) {
+                                                                                updateColorField(['theme', 'styles', selectedThemeMode, 'muted-foreground'], hex);
+                                                                            }
+                                                                        }}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="#000000"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <Label>OKLCH</Label>
+                                                                    <Input
+                                                                        value={editedData.theme.styles[selectedThemeMode]['muted-foreground']}
+                                                                        onChange={(e) => updateField(['theme', 'styles', selectedThemeMode, 'muted-foreground'], e.target.value)}
+                                                                        className="bg-background border-input font-mono text-sm"
+                                                                        placeholder="oklch(50% 0.1 180)"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            </Accordion>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="bg-card text-card-foreground border-border">
+                                        <CardHeader>
+                                            <CardTitle>Theme Preview</CardTitle>
+                                            <CardDescription>Preview of selected theme colors with portfolio components</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div
+                                                className="p-4 rounded-lg border space-y-4"
+                                                style={{
+                                                    backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].background),
+                                                    color: oklchToHex(editedData.theme.styles[selectedThemeMode].foreground),
+                                                    borderColor: oklchToHex(editedData.theme.styles[selectedThemeMode].border),
+                                                }}
+                                            >
+                                                <div className="text-sm font-medium">Preview</div>
+
+                                                <div className="flex gap-2 flex-wrap">
+                                                    <Button
+                                                        className="w-fit"
+                                                        style={{
+                                                            backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].primary),
+                                                            color: oklchToHex(editedData.theme.styles[selectedThemeMode]['primary-foreground']),
+                                                        }}
+                                                    >
+                                                        Primary Button
+                                                    </Button>
+                                                    <Button
+                                                        variant="secondary"
+                                                        className="w-fit"
+                                                        style={{
+                                                            backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].secondary),
+                                                            color: oklchToHex(editedData.theme.styles[selectedThemeMode]['secondary-foreground']),
+                                                        }}
+                                                    >
+                                                        Secondary Button
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-fit"
+                                                        style={{
+                                                            borderColor: oklchToHex(editedData.theme.styles[selectedThemeMode].border),
+                                                            color: oklchToHex(editedData.theme.styles[selectedThemeMode].foreground),
+                                                        }}
+                                                    >
+                                                        Outline Button
+                                                    </Button>
                                                 </div>
-                                            ))}
+
+                                                <Separator
+                                                    style={{
+                                                        backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].border),
+                                                    }}
+                                                />
+
+                                                <Card
+                                                    style={{
+                                                        backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].card),
+                                                        color: oklchToHex(editedData.theme.styles[selectedThemeMode]['card-foreground']),
+                                                        borderColor: oklchToHex(editedData.theme.styles[selectedThemeMode].border),
+                                                    }}
+                                                >
+                                                    <CardHeader>
+                                                        <CardTitle>Project Card</CardTitle>
+                                                        <CardDescription
+                                                            style={{ color: oklchToHex(editedData.theme.styles[selectedThemeMode]['muted-foreground']) }}
+                                                        >
+                                                            Showcase your projects
+                                                        </CardDescription>
+                                                    </CardHeader>
+                                                    <CardContent className="space-y-2">
+                                                        <div className="flex flex-wrap gap-2">
+                                                            <Badge
+                                                                style={{
+                                                                    backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].accent),
+                                                                    color: oklchToHex(editedData.theme.styles[selectedThemeMode]['accent-foreground']),
+                                                                }}
+                                                            >
+                                                                React
+                                                            </Badge>
+                                                            <Badge
+                                                                style={{
+                                                                    backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].secondary),
+                                                                    color: oklchToHex(editedData.theme.styles[selectedThemeMode]['secondary-foreground']),
+                                                                }}
+                                                            >
+                                                                TypeScript
+                                                            </Badge>
+                                                        </div>
+                                                        <Input
+                                                            placeholder="Project link"
+                                                            className="w-full"
+                                                            style={{
+                                                                backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].input),
+                                                                color: oklchToHex(editedData.theme.styles[selectedThemeMode].foreground),
+                                                                borderColor: oklchToHex(editedData.theme.styles[selectedThemeMode].border),
+                                                            }}
+                                                        />
+                                                    </CardContent>
+                                                </Card>
+
+                                                <div
+                                                    className="px-3 py-2 rounded text-sm"
+                                                    style={{
+                                                        backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].accent),
+                                                        color: oklchToHex(editedData.theme.styles[selectedThemeMode]['accent-foreground']),
+                                                    }}
+                                                >
+                                                    Accent Element
+                                                </div>
+                                            </div>
                                         </CardContent>
                                     </Card>
                                 </div>
                             </TabsContent>
                         </Tabs>
-                    </div>
-
-                    {/* Theme Preview Sidebar */}
-                    <div className="xl:col-span-1">
-                        <div className="sticky top-4">
-                            <Card className="bg-card text-card-foreground border-border">
-                                <CardHeader>
-                                    <div className="flex items-center justify-between">
-                                        <CardTitle className="text-base">Theme Preview</CardTitle>
-                                        <div className="flex gap-1">
-                                            <Button
-                                                variant={previewMode === 'light' ? 'default' : 'outline'}
-                                                onClick={() => setPreviewMode('light')}
-                                                size="sm"
-                                                className="text-xs"
-                                            >
-                                                Light
-                                            </Button>
-                                            <Button
-                                                variant={previewMode === 'dark' ? 'default' : 'outline'}
-                                                onClick={() => setPreviewMode('dark')}
-                                                size="sm"
-                                                className="text-xs"
-                                            >
-                                                Dark
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div 
-                                        className="p-4 rounded-lg border space-y-3"
-                                        style={{
-                                            backgroundColor: oklchToHex(editedData.theme.styles[previewMode].background),
-                                            color: oklchToHex(editedData.theme.styles[previewMode].foreground),
-                                            borderColor: oklchToHex(editedData.theme.styles[previewMode].border),
-                                        }}
-                                    >
-                                        <div className="text-sm font-medium">Preview</div>
-                                        
-                                        <div 
-                                            className="px-3 py-2 rounded text-sm"
-                                            style={{
-                                                backgroundColor: oklchToHex(editedData.theme.styles[previewMode].primary),
-                                                color: oklchToHex(editedData.theme.styles[previewMode]["primary-foreground"]),
-                                            }}
-                                        >
-                                            Primary Button
-                                        </div>
-                                        
-                                        <div 
-                                            className="px-3 py-2 rounded text-sm"
-                                            style={{
-                                                backgroundColor: oklchToHex(editedData.theme.styles[previewMode].secondary),
-                                                color: oklchToHex(editedData.theme.styles[previewMode]["secondary-foreground"]),
-                                            }}
-                                        >
-                                            Secondary Button
-                                        </div>
-                                        
-                                        <div 
-                                            className="p-3 rounded text-sm"
-                                            style={{
-                                                backgroundColor: oklchToHex(editedData.theme.styles[previewMode].card),
-                                                color: oklchToHex(editedData.theme.styles[previewMode]["card-foreground"]),
-                                                border: `1px solid ${oklchToHex(editedData.theme.styles[previewMode].border)}`,
-                                            }}
-                                        >
-                                            <div className="font-medium mb-1">Card Component</div>
-                                            <div 
-                                                className="text-sm"
-                                                style={{ color: oklchToHex(editedData.theme.styles[previewMode]["muted-foreground"]) }}
-                                            >
-                                                Card description text
-                                            </div>
-                                        </div>
-                                        
-                                        <div 
-                                            className="px-3 py-2 rounded text-sm"
-                                            style={{
-                                                backgroundColor: oklchToHex(editedData.theme.styles[previewMode].accent),
-                                                color: oklchToHex(editedData.theme.styles[previewMode]["accent-foreground"]),
-                                            }}
-                                        >
-                                            Accent Element
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
                     </div>
                 </div>
 

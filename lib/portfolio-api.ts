@@ -236,3 +236,24 @@ export async function triggerRevalidation(path: string = '/'): Promise<void> {
     console.error('Failed to trigger revalidation:', error);
   }
 }
+
+export const applyTheme = (theme: PortfolioData["theme"], mode: 'light' | 'dark') => {
+  if (typeof window === "undefined") return;
+
+  const root = document.documentElement;
+  const modeStyles = mode;
+
+  try {
+    Object.entries(modeStyles).forEach(([key, val]) => {
+      root.style.setProperty(`--${key}`, val.trim());
+    });
+
+    root.classList.toggle("dark", mode === "dark");
+
+    root.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+
+  } catch (error) {
+    console.error("Error applying theme:", error);
+    root.classList.toggle("dark", mode === "dark");
+  }
+};
