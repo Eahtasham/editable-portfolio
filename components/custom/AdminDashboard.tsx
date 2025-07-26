@@ -90,11 +90,11 @@ export default function AdminDashboard() {
         contacts: 6
     });
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            router.push('/admin/login');
-        }
-    }, [isAuthenticated]);
+    // useEffect(() => {
+    //     if (!isAuthenticated) {
+    //         router.push('/admin/login');
+    //     }
+    // }, [isAuthenticated]);
 
     useEffect(() => {
         if (portfolioData) {

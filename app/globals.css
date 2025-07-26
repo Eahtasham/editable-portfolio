@@ -120,3 +120,66 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Background gradients */
+  .bg-gradient-primary {
+    background-image: linear-gradient(135deg, var(--primary), var(--secondary));
+  }
+
+  .bg-gradient-accent {
+    background-image: linear-gradient(135deg, var(--accent), var(--primary));
+  }
+
+  /* Text gradients */
+  .text-gradient-primary {
+    background-image: linear-gradient(to right, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .text-gradient-accent {
+    background-image: linear-gradient(to right, var(--accent), var(--primary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Border using variable */
+  .border-primary {
+    border-color: var(--primary);
+  }
+
+  .border-secondary {
+    border-color: var(--secondary);
+  }
+
+  /* Ring using variable */
+  .ring-primary {
+    --tw-ring-color: var(--ring);
+  }
+
+  .ring-accent {
+    --tw-ring-color: var(--accent);
+  }
+
+  /* Backgrounds using variables */
+  .bg-primary {
+    background-color: var(--primary);
+  }
+
+  .bg-secondary {
+    background-color: var(--secondary);
+  }
+
+  .bg-accent {
+    background-color: var(--accent);
+  }
+
+  /* Text color using variables */
+
+}
+
