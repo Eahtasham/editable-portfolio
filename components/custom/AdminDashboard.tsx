@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Save, Plus, Trash2, User, Briefcase, FolderOpen, Mail, Palette, GripVertical, ArrowUp, ArrowDown, GraduationCap, Settings } from 'lucide-react';
+import { Loader2, Save, Plus, Trash2, User, Briefcase, FolderOpen, Mail, Palette, GripVertical, ArrowUp, ArrowDown, GraduationCap, Settings, ArrowRight } from 'lucide-react';
 import { updatePortfolioData } from '../../lib/portfolio-api';
 import { PortfolioData } from '../../context/PortfolioContext';
 import { toast } from 'sonner';
@@ -282,6 +282,127 @@ export default function AdminDashboard() {
         setIsDirty(true);
     };
 
+    // Define the interface for theme styles
+    interface ThemeStyles {
+        [key: string]: string; // Allows string indexing with string values (OKLCH colors)
+        background: string;
+        foreground: string;
+        card: string;
+        'card-foreground': string;
+        popover: string;
+        'popover-foreground': string;
+        primary: string;
+        'primary-foreground': string;
+        secondary: string;
+        'secondary-foreground': string;
+        muted: string;
+        'muted-foreground': string;
+        accent: string;
+        'accent-foreground': string;
+        destructive: string;
+        'destructive-foreground': string;
+        border: string;
+        input: string;
+        ring: string;
+    }
+
+    // Define the interface for the styles object
+    interface ThemeConfig {
+        light: ThemeStyles;
+        dark: ThemeStyles;
+    }
+
+    function parseThemeConfig(config: string): ThemeConfig {
+        const styles: ThemeConfig = {
+            light: {
+                background: 'oklch(50% 0.1 180)',
+                foreground: 'oklch(50% 0.1 180)',
+                card: 'oklch(50% 0.1 180)',
+                'card-foreground': 'oklch(50% 0.1 180)',
+                popover: 'oklch(50% 0.1 180)',
+                'popover-foreground': 'oklch(50% 0.1 180)',
+                primary: 'oklch(50% 0.1 180)',
+                'primary-foreground': 'oklch(50% 0.1 180)',
+                secondary: 'oklch(50% 0.1 180)',
+                'secondary-foreground': 'oklch(50% 0.1 180)',
+                muted: 'oklch(50% 0.1 180)',
+                'muted-foreground': 'oklch(50% 0.1 180)',
+                accent: 'oklch(50% 0.1 180)',
+                'accent-foreground': 'oklch(50% 0.1 180)',
+                destructive: 'oklch(50% 0.1 180)',
+                'destructive-foreground': 'oklch(50% 0.1 180)',
+                border: 'oklch(50% 0.1 180)',
+                input: 'oklch(50% 0.1 180)',
+                ring: 'oklch(50% 0.1 180)',
+            },
+            dark: {
+                background: 'oklch(50% 0.1 180)',
+                foreground: 'oklch(50% 0.1 180)',
+                card: 'oklch(50% 0.1 180)',
+                'card-foreground': 'oklch(50% 0.1 180)',
+                popover: 'oklch(50% 0.1 180)',
+                'popover-foreground': 'oklch(50% 0.1 180)',
+                primary: 'oklch(50% 0.1 180)',
+                'primary-foreground': 'oklch(50% 0.1 180)',
+                secondary: 'oklch(50% 0.1 180)',
+                'secondary-foreground': 'oklch(50% 0.1 180)',
+                muted: 'oklch(50% 0.1 180)',
+                'muted-foreground': 'oklch(50% 0.1 180)',
+                accent: 'oklch(50% 0.1 180)',
+                'accent-foreground': 'oklch(50% 0.1 180)',
+                destructive: 'oklch(50% 0.1 180)',
+                'destructive-foreground': 'oklch(50% 0.1 180)',
+                border: 'oklch(50% 0.1 180)',
+                input: 'oklch(50% 0.1 180)',
+                ring: 'oklch(50% 0.1 180)',
+            },
+        };
+
+        const keys = [
+            'background', 'foreground', 'card', 'card-foreground', 'popover', 'popover-foreground',
+            'primary', 'primary-foreground', 'secondary', 'secondary-foreground', 'muted',
+            'muted-foreground', 'accent', 'accent-foreground', 'destructive', 'destructive-foreground',
+            'border', 'input', 'ring',
+        ];
+
+        // Extract :root and .dark sections
+        const rootMatch = config.match(/:root\s*\{([^}]*)\}/);
+        const darkMatch = config.match(/\.dark\s*\{([^}]*)\}/);
+
+        if (rootMatch) {
+            const rootVars = rootMatch[1].split(';').map(s => s.trim()).filter(s => s);
+            rootVars.forEach(varDef => {
+                const [key, value] = varDef.split(':').map(s => s.trim());
+                const cleanKey = key.replace(/^--/, '');
+                if (keys.includes(cleanKey)) {
+                    // Convert OKLCH values from decimal to percentage format
+                    const match = value.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
+                    if (match) {
+                        const [_, l, c, h] = match;
+                        styles.light[cleanKey] = `oklch(${parseFloat(l) * 100}% ${c} ${h})`;
+                    }
+                }
+            });
+        }
+
+        if (darkMatch) {
+            const darkVars = darkMatch[1].split(';').map(s => s.trim()).filter(s => s);
+            darkVars.forEach(varDef => {
+                const [key, value] = varDef.split(':').map(s => s.trim());
+                const cleanKey = key.replace(/^--/, '');
+                if (keys.includes(cleanKey)) {
+                    const match = value.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
+                    if (match) {
+                        const [_, l, c, h] = match;
+                        styles.dark[cleanKey] = `oklch(${parseFloat(l) * 100}% ${c} ${h})`;
+                    }
+                }
+            });
+        }
+
+        return styles;
+    }
+
     if (!editedData) {
         return (
             <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
@@ -320,40 +441,40 @@ export default function AdminDashboard() {
                 <div className="w-full">
                     {/* Main Content */}
                     <div className="xl:col-span-3">
-                        <Tabs defaultValue="hero" className="space-y-4">
+                        <Tabs defaultValue="ordering" className="space-y-4">
                             <div className="overflow-x-auto">
-                                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 bg-muted min-w-max">
-                                    <TabsTrigger value="ordering" className="flex items-center gap-1">
+                                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 bg-muted lg:min-w-max">
+                                    <TabsTrigger value="ordering" className="flex flex-col sm:flex-row items-center gap-1">
                                         <GripVertical className="h-4 w-4" />
-                                        Ordering
+                                        <span className="text-xs sm:text-sm hidden sm:inline">Ordering</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="hero" className="flex items-center gap-1 text-xs lg:text-sm">
+                                    <TabsTrigger value="hero" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                         <User className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span className="hidden sm:inline">Hero</span>
+                                        <span className="text-xs sm:text-sm hidden sm:inline">Hero</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="about" className="flex items-center gap-1 text-xs lg:text-sm">
+                                    <TabsTrigger value="about" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                         <User className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span className="hidden sm:inline">About</span>
+                                        <span className="text-xs sm:text-sm hidden sm:inline">About</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="projects" className="flex items-center gap-1 text-xs lg:text-sm">
+                                    <TabsTrigger value="projects" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                         <FolderOpen className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span className="hidden sm:inline">Projects</span>
+                                        <span className="text-xs sm:text-sm hidden sm:inline">Projects</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="experience" className="flex items-center gap-1 text-xs lg:text-sm">
+                                    <TabsTrigger value="experience" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                         <Briefcase className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span className="hidden sm:inline">Experience</span>
+                                        <span className="text-xs sm:text-sm hidden sm:inline">Experience</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="education" className="flex items-center gap-1 text-xs lg:text-sm">
+                                    <TabsTrigger value="education" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                         <GraduationCap className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span className="hidden sm:inline">Education</span>
+                                        <span className="text-xs sm:text-sm hidden sm:inline">Education</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="contacts" className="flex items-center gap-1 text-xs lg:text-sm">
+                                    <TabsTrigger value="contacts" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                         <Mail className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span className="hidden sm:inline">Contacts</span>
+                                        <span className="text-xs sm:text-sm hidden sm:inline">Contacts</span>
                                     </TabsTrigger>
-                                    <TabsTrigger value="theme" className="flex items-center gap-1">
+                                    <TabsTrigger value="theme" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                         <Palette className="h-4 w-4" />
-                                        Theme
+                                        <span className="text-xs sm:text-sm hidden sm:inline">Theme</span>
                                     </TabsTrigger>
                                 </TabsList>
                             </div>
@@ -454,7 +575,7 @@ export default function AdminDashboard() {
                                 </Card>
                             </TabsContent>
 
-                            {/* Projects Section - Same as before */}
+                            {/* Projects Section  */}
                             <TabsContent value="projects">
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
@@ -590,7 +711,7 @@ export default function AdminDashboard() {
                                 </div>
                             </TabsContent>
 
-                            {/* Experience Section - Same as before */}
+                            {/* Experience Section */}
                             <TabsContent value="experience">
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
@@ -764,7 +885,7 @@ export default function AdminDashboard() {
                                 </div>
                             </TabsContent>
 
-                            {/* Contacts Section - Same as before */}
+                            {/* Contacts Section  */}
                             <TabsContent value="contacts">
                                 <Card className="bg-card text-card-foreground border-border">
                                     <CardHeader>
@@ -859,12 +980,13 @@ export default function AdminDashboard() {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
+
                             <TabsContent value="theme">
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <CardTitle>Theme Settings</CardTitle>
-                                            <CardDescription>Select a theme mode to customize colors</CardDescription>
+                                            <CardDescription>Customize colors by selecting a theme mode or pasting a configuration</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-6">
                                             <div className="space-y-2">
@@ -892,7 +1014,35 @@ export default function AdminDashboard() {
                                                     </Button>
                                                 </div>
                                             </div>
-
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Label>Recommended: Paste Theme Configuration from TweakCn</Label>
+                                                    <a
+                                                        href="https://tweakcn.com/"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-primary hover:underline"
+                                                    >
+                                                        <ArrowUp className='rotate-45 h-4 w-4' />
+                                                    </a>
+                                                </div>
+                                                <Textarea
+                                                    placeholder="Paste your theme configuration here (e.g., :root { --background: oklch(0.9751 0.0127 244.2507); ... })"
+                                                    className="bg-background border-input font-mono text-sm h-25"
+                                                    onChange={(e) => {
+                                                        const config = e.target.value;
+                                                        try {
+                                                            const parsed = parseThemeConfig(config);
+                                                            updateField(['theme', 'styles'], parsed);
+                                                        } catch (error) {
+                                                            console.error('Invalid theme configuration:', error);
+                                                        }
+                                                    }}
+                                                />
+                                                <p className="text-sm text-muted-foreground">
+                                                    Paste CSS custom properties to apply theme. Supports OKLCH values for light and dark modes.
+                                                </p>
+                                            </div>
                                             <Accordion type="single" collapsible className="w-full">
                                                 <AccordionItem value="primary-colors">
                                                     <AccordionTrigger className="capitalize">Primary Colors</AccordionTrigger>
@@ -1481,7 +1631,6 @@ export default function AdminDashboard() {
                                             </Accordion>
                                         </CardContent>
                                     </Card>
-
                                     <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <CardTitle>Theme Preview</CardTitle>
@@ -1497,7 +1646,6 @@ export default function AdminDashboard() {
                                                 }}
                                             >
                                                 <div className="text-sm font-medium">Preview</div>
-
                                                 <div className="flex gap-2 flex-wrap">
                                                     <Button
                                                         className="w-fit"
@@ -1529,13 +1677,7 @@ export default function AdminDashboard() {
                                                         Outline Button
                                                     </Button>
                                                 </div>
-
-                                                <Separator
-                                                    style={{
-                                                        backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].border),
-                                                    }}
-                                                />
-
+                                                <Separator style={{ backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].border) }} />
                                                 <Card
                                                     style={{
                                                         backgroundColor: oklchToHex(editedData.theme.styles[selectedThemeMode].card),
@@ -1545,9 +1687,7 @@ export default function AdminDashboard() {
                                                 >
                                                     <CardHeader>
                                                         <CardTitle>Project Card</CardTitle>
-                                                        <CardDescription
-                                                            style={{ color: oklchToHex(editedData.theme.styles[selectedThemeMode]['muted-foreground']) }}
-                                                        >
+                                                        <CardDescription style={{ color: oklchToHex(editedData.theme.styles[selectedThemeMode]['muted-foreground']) }}>
                                                             Showcase your projects
                                                         </CardDescription>
                                                     </CardHeader>
@@ -1581,7 +1721,6 @@ export default function AdminDashboard() {
                                                         />
                                                     </CardContent>
                                                 </Card>
-
                                                 <div
                                                     className="px-3 py-2 rounded text-sm"
                                                     style={{

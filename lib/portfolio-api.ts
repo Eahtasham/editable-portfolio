@@ -117,23 +117,23 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
   try {
     console.log('Fetching portfolio data...');
 
-    // const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-    //   headers: {
-    //     "X-Master-Key": API_KEY,
-    //   },
-    //   // Important for ISR: Don't cache this request
-    //   next: { revalidate: 0 }
-    // });
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: {
+        "X-Master-Key": API_KEY,
+      },
+      // Important for ISR: Don't cache this request
+      next: { revalidate: 0 }
+    });
 
-    // if (!res.ok) {
-    //   throw new Error(`HTTP error! status: ${res.status}`);
-    // }
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
 
-    // const result = await res.json();
+    const result = await res.json();
     console.log('Portfolio data fetched successfully');
 
-    // return result.record || defaultData;
-    return defaultData;
+    return result.record || defaultData;
+    // return defaultData;
   } catch (error) {
     console.error('Error fetching portfolio data:', error);
     console.log('Falling back to default data');
