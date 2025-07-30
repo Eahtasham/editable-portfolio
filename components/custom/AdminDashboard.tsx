@@ -73,6 +73,7 @@ interface SectionOrder {
     about: number;
     projects: number;
     experience: number;
+    skills: number;
     education: number;
     contacts: number;
 }
@@ -120,6 +121,7 @@ export default function AdminDashboard() {
         about: 2,
         projects: 3,
         experience: 4,
+        skills: 5,
         education: 5,
         contacts: 6
     });

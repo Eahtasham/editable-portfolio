@@ -59,8 +59,9 @@ const defaultData: PortfolioData = {
     about: 2,
     projects: 3,
     experience: 4,
-    education: 5,
-    contacts: 6
+    skills: 5,
+    education: 6,
+    contacts: 7
   },
   hero: {
     heading: "Hi, I'm Eahtasham",

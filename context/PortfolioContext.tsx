@@ -17,6 +17,7 @@ export interface PortfolioData {
     about: number;
     projects: number;
     experience: number;
+    skills: number;
     education: number;
     contacts: number;
   };
