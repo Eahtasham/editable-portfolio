@@ -26,9 +26,44 @@ export interface PortfolioData {
     subheading: string;
     cta: string;
     image: string;
+    greeting?: string;
+    highlights?: string[];
+    socialLinks?: Array<{
+      name: string;
+      url: string;
+      icon: string;
+    }>;
+    stats?: Array<{
+      number: string;
+      label: string;
+    }>;
+    skills?: string[];
+    location?: string;
+    tagline?: string;
+    downloadCV?: string; // CV download link
   };
   about: {
     markdown: string;
+    personalInfo?: {
+      fullName: string;
+      age?: number;
+      nationality?: string;
+      languages?: string[];
+      hobbies?: string[];
+    };
+    professionalSummary?: string;
+    achievements?: Array<{
+      title: string;
+      description: string;
+      year: string;
+    }>;
+    certifications?: Array<{
+      name: string;
+      issuer: string;
+      year: string;
+      credentialId?: string;
+      link?: string;
+    }>;
   };
   projects: Array<{
     id: string;
@@ -38,6 +73,12 @@ export interface PortfolioData {
     link?: string;
     github?: string;
     image: string;
+    // Enhanced project data
+    category?: string;
+    status?: 'completed' | 'in-progress' | 'planned';
+    year?: string;
+    role?: string;
+    features?: string[];
   }>;
   education: Array<{
     id: string;
@@ -45,6 +86,10 @@ export interface PortfolioData {
     degree: string;
     year: string;
     description: string;
+    location?: string;
+    gpa?: string;
+    major?: string;
+    logo?: string;
   }>;
   experience: Array<{
     id: string;
@@ -52,17 +97,43 @@ export interface PortfolioData {
     role: string;
     year: string;
     description: string;
+    location?: string;
+    type?: 'full-time' | 'part-time' | 'contract' | 'internship' | 'freelance';
+    current?: boolean;
+    achievements?: string[];
+    technologies?: string[];
+    responsibilities?: string[];
+    companyLogo?: string;
+    companyWebsite?: string;
   }>;
   skills: {
     frontend: string[];
     backend: string[];
     tools: string[];
+    databases?: string[];
+    cloud?: string[];
+    mobile?: string[];
+    design?: string[];
+    testing?: string[];
+    devops?: string[];
+    languages?: Array<{
+      name: string;
+      proficiency: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+      yearsOfExperience?: number;
+    }>;
+    frameworks?: Array<{
+      name: string;
+      category: string;
+      proficiency: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    }>;
   };
   contacts: {
     email: string;
     twitter?: string;
     github?: string;
     linkedin?: string;
+    discord?: string;
+    telegram?: string;
   };
 }
 
