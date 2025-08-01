@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { PortfolioData } from "@/context/PortfolioContext";
+import { PortfolioData, usePortfolio } from "@/context/PortfolioContext";
 import { LucideGithub, LucideLinkedin, MapPin, Download } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -82,15 +82,13 @@ const GradientText = ({ children, className = "" }:any) => (
   </span>
 );
 
-export interface HeroSectionProps {
-  hero: PortfolioData['hero']  
-}
-
-export const HeroSection = ({ hero }: HeroSectionProps) => {
+export const HeroSection = () => {
+  const {data} = usePortfolio();
+  const hero=data.hero;
   const showImage = !isPlaceholder(hero.image);
 
   return (
-    <section className="relative w-full overflow-hidden">
+    <section className="min-h-screen flex items-center justify-center gradient-hero pt-14">
       {/* Background with subtle pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-muted/20" />
       <div 
@@ -108,11 +106,11 @@ export const HeroSection = ({ hero }: HeroSectionProps) => {
           <div className={`flex-1 space-y-6 ${showImage ? 'text-left' : 'text-center'} max-w-2xl`}>
             
             {/* Greeting */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Badge variant="outline" className="text-xs font-medium tracking-wider uppercase px-4 py-1.5 border-primary/20 bg-primary/5">
                 {hero.greeting}
               </Badge>
-            </div>
+            </div> */}
 
             {/* Main Heading */}
             <div className="space-y-3">

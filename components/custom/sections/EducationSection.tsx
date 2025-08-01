@@ -1,11 +1,7 @@
-import { PortfolioData } from '@/context/PortfolioContext'
 import React from 'react'
 
-interface EducationSectionProps {
-  education: PortfolioData['education']
-}
 
-export const EducationSection = ({education}:EducationSectionProps) => {
+export const EducationSection = () => {
   return (
     <div>EducationSection</div>
   )

@@ -1,11 +1,7 @@
-import { PortfolioData } from '@/context/PortfolioContext'
 import React from 'react'
 
-interface AboutSectionProps {
- about:PortfolioData['about'] 
-}
 
-export const AboutSection = ({about}:AboutSectionProps) => {
+export const AboutSection = () => {
   return (
     <div>AboutSection</div>
   )

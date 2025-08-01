@@ -8,47 +8,52 @@ import { ExperienceSection } from "./sections/ExperienceSection"
 import { EducationSection } from "./sections/EducationSection"
 import { SkillsSection } from "./sections/SkillsSection"
 import { ContactSection } from "./sections/ContactSection"
-
+import { Nav } from "./Nav"
+import { Footer } from "./Footer"
 
 export default function HomePage() {
-  const { data,loading } = usePortfolio()
+  const { data, loading } = usePortfolio()
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   // Create ordered sections based on sectionOrder
   const sectionComponents = {
-    hero: <HeroSection key="hero" hero={data.hero} />,
-    about: <AboutSection key="about" about={data.about} />,
-    projects: <ProjectSection key="projects" projects={data.projects} />,
-    experience: <ExperienceSection key="experience" experience={data.experience} />,
-    education: <EducationSection key="education" education={data.education} />,
-    skills: <SkillsSection key="skills" skills={data.skills} />,
-    contacts: <ContactSection key="contacts" contacts={data.contacts} />,
+    hero: <HeroSection key="hero" />,
+    about: <AboutSection key="about" />,
+    projects: <ProjectSection key="projects" />,
+    experience: <ExperienceSection key="experience" />,
+    education: <EducationSection key="education" />,
+    skills: <SkillsSection key="skills" />,
+    contacts: <ContactSection key="contacts" />,
   }
 
-  // Sort sections by order and add skills section
-  const orderedSections = Object.entries({ ...data.sectionOrder, skills: 5.5 })
-    .sort(([, a]:any, [, b]:any) => a - b)
+  // Sort sections by order
+  const orderedSections = Object.entries(data.sectionOrder)
+    .sort(([, a], [, b]) => a - b)
     .map(([sectionName]) => sectionComponents[sectionName as keyof typeof sectionComponents])
 
-  const sectionNames = Object.keys({ ...data.sectionOrder, skills: 5.5 }).sort(
+  const sectionNames = Object.keys(data.sectionOrder).sort(
     (a, b) =>
-      (({ ...data.sectionOrder, skills: 5.5 })[a] as number) - ({ ...data.sectionOrder, skills: 5.5 }[b] as number),
+      data.sectionOrder[a as keyof typeof data.sectionOrder] - data.sectionOrder[b as keyof typeof data.sectionOrder],
   )
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* <Navigation sections={sectionNames} /> */}
-      <div>
+      <Nav sections={sectionNames} />
+      <main>
         {orderedSections.map((section, index) => (
-          <div key={index} id={sectionNames[index]}>
+          <section key={index} id={sectionNames[index]} className="scroll-mt-16">
             {section}
-          </div>
+          </section>
         ))}
-      </div>
-      {/* <Footer /> */}
+      </main>
+      <Footer />
     </div>
   )
 }
