@@ -9,44 +9,49 @@ const defaultData: PortfolioData = {
   theme: {
     styles: {
       light: {
-        background: "oklch(100% 0 0)",
-        foreground: "oklch(9% 0.026 285.75)",
-        primary: "oklch(56.27% 0.194 12.57)",
-        "primary-foreground": "oklch(98% 0.013 285.75)",
-        secondary: "oklch(96% 0.013 285.75)",
-        "secondary-foreground": "oklch(11.2% 0.026 285.75)",
-        accent: "oklch(96% 0.013 285.75)",
-        "accent-foreground": "oklch(11.2% 0.026 285.75)",
-        muted: "oklch(96% 0.013 285.75)",
-        "muted-foreground": "oklch(46.9% 0.009 285.75)",
+        background: "oklch(97.51% 0.0127 244.2507)",
+        foreground: "oklch(37.29% 0.0306 259.7328)",
         card: "oklch(100% 0 0)",
-        "card-foreground": "oklch(9% 0.026 285.75)",
-        destructive: "oklch(60.2% 0.199 29.23)",
-        "destructive-foreground": "oklch(98% 0.013 285.75)",
-        border: "oklch(91.4% 0.008 285.75)",
-        input: "oklch(91.4% 0.008 285.75)",
-        ring: "oklch(9% 0.026 285.75)",
+        "card-foreground": "oklch(37.29% 0.0306 259.7328)",
+        popover: "oklch(100% 0 0)",
+        "popover-foreground": "oklch(37.29% 0.0306 259.7328)",
+        primary: "oklch(72.27% 0.192 149.5793)",
+        "primary-foreground": "oklch(100% 0 0)",
+        secondary: "oklch(95.14% 0.025 236.8242)",
+        "secondary-foreground": "oklch(44.61% 0.0263 256.8018)",
+        muted: "oklch(96.7% 0.0029 264.5419)",
+        "muted-foreground": "oklch(55.1% 0.0234 264.3637)",
+        accent: "oklch(95.05% 0.0507 163.0508)",
+        "accent-foreground": "oklch(37.29% 0.0306 259.7328)",
+        destructive: "oklch(63.68% 0.2078 25.3313)",
+        "destructive-foreground": "oklch(100% 0 0)",
+        border: "oklch(92.76% 0.0058 264.5313)",
+        input: "oklch(92.76% 0.0058 264.5313)",
+        ring: "oklch(72.27% 0.192 149.5793)",
       },
       dark: {
-        background: "oklch(9% 0.026 285.75)",
-        foreground: "oklch(98% 0.013 285.75)",
-        primary: "oklch(98% 0.013 285.75)",
-        "primary-foreground": "oklch(11.2% 0.026 285.75)",
-        secondary: "oklch(17.5% 0.015 285.75)",
-        "secondary-foreground": "oklch(98% 0.013 285.75)",
-        accent: "oklch(17.5% 0.015 285.75)",
-        "accent-foreground": "oklch(98% 0.013 285.75)",
-        muted: "oklch(17.5% 0.015 285.75)",
-        "muted-foreground": "oklch(65.1% 0.011 285.75)",
-        card: "oklch(9% 0.026 285.75)",
-        "card-foreground": "oklch(98% 0.013 285.75)",
-        destructive: "oklch(30.6% 0.124 29.23)",
-        "destructive-foreground": "oklch(98% 0.013 285.75)",
-        border: "oklch(17.5% 0.015 285.75)",
-        input: "oklch(17.5% 0.015 285.75)",
-        ring: "oklch(83.9% 0.016 285.75)",
+        background: "oklch(20.77% 0.0398 265.7549)",
+        foreground: "oklch(87.17% 0.0093 258.3382)",
+        card: "oklch(27.95% 0.0368 260.0310)",
+        "card-foreground": "oklch(87.17% 0.0093 258.3382)",
+        popover: "oklch(27.95% 0.0368 260.0310)",
+        "popover-foreground": "oklch(87.17% 0.0093 258.3382)",
+        primary: "oklch(77.29% 0.1535 163.2231)",
+        "primary-foreground": "oklch(20.77% 0.0398 265.7549)",
+        secondary: "oklch(33.51% 0.0331 260.9120)",
+        "secondary-foreground": "oklch(71.18% 0.0129 286.0665)",
+        muted: "oklch(27.95% 0.0368 260.0310)",
+        "muted-foreground": "oklch(55.1% 0.0234 264.3637)",
+        accent: "oklch(37.29% 0.0306 259.7328)",
+        "accent-foreground": "oklch(71.18% 0.0129 286.0665)",
+        destructive: "oklch(63.68% 0.2078 25.3313)",
+        "destructive-foreground": "oklch(20.77% 0.0398 265.7549)",
+        border: "oklch(44.61% 0.0263 256.8018)",
+        input: "oklch(44.61% 0.0263 256.8018)",
+        ring: "oklch(77.29% 0.1535 163.2231)",
       },
     },
+
     currentMode: "dark",
   },
   sectionOrder: {
@@ -54,8 +59,9 @@ const defaultData: PortfolioData = {
     about: 2,
     projects: 3,
     experience: 4,
-    education: 5,
-    contacts: 6
+    skills: 5,
+    education: 6,
+    contacts: 7
   },
   hero: {
     heading: "Hi, I'm Eahtasham",
@@ -231,3 +237,24 @@ export async function triggerRevalidation(path: string = '/'): Promise<void> {
     console.error('Failed to trigger revalidation:', error);
   }
 }
+
+export const applyTheme = (theme: PortfolioData["theme"], mode: 'light' | 'dark') => {
+  if (typeof window === "undefined") return;
+
+  const root = document.documentElement;
+  const modeStyles = mode;
+
+  try {
+    Object.entries(modeStyles).forEach(([key, val]) => {
+      root.style.setProperty(`--${key}`, val.trim());
+    });
+
+    root.classList.toggle("dark", mode === "dark");
+
+    root.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+
+  } catch (error) {
+    console.error("Error applying theme:", error);
+    root.classList.toggle("dark", mode === "dark");
+  }
+};

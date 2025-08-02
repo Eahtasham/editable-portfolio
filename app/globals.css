@@ -120,3 +120,121 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Background gradients */
+  .bg-gradient-primary {
+    background-image: linear-gradient(135deg, var(--primary), var(--secondary));
+  }
+
+  .bg-gradient-accent {
+    background-image: linear-gradient(135deg, var(--accent), var(--primary));
+  }
+
+  /* Text gradients */
+  .text-gradient-primary {
+    background-image: linear-gradient(to right, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .text-gradient-accent {
+    background-image: linear-gradient(to right, var(--accent), var(--primary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Border using variable */
+  .border-primary {
+    border-color: var(--primary);
+  }
+
+  .border-secondary {
+    border-color: var(--secondary);
+  }
+
+  /* Ring using variable */
+  .ring-primary {
+    --tw-ring-color: var(--ring);
+  }
+
+  .ring-accent {
+    --tw-ring-color: var(--accent);
+  }
+
+  /* Backgrounds using variables */
+  .bg-primary {
+    background-color: var(--primary);
+  }
+
+  .bg-secondary {
+    background-color: var(--secondary);
+  }
+
+  .bg-accent {
+    background-color: var(--accent);
+  }
+
+  /* Text color using variables */
+
+
+  .bg-gradient-primary {
+    background-image: linear-gradient(135deg, var(--primary), var(--accent));
+  }
+
+  .bg-gradient-secondary {
+    background-image: linear-gradient(135deg, var(--secondary), var(--primary));
+  }
+
+  .bg-gradient-hero {
+    background-image: linear-gradient(
+      135deg,
+      var(--background) 0%,
+      color-mix(in oklch, var(--primary) 10%, transparent) 50%,
+      color-mix(in oklch, var(--accent) 10%, transparent) 100%
+    );
+  }
+
+  .bg-gradient-hero-accent {
+    background-image: linear-gradient(45deg, color-mix(in oklch, var(--primary) 20%, transparent), color-mix(in oklch, var(--accent) 20%, transparent));
+  }
+
+  .bg-gradient-modern {
+    background-image: linear-gradient(135deg, var(--background), var(--secondary), color-mix(in oklch, var(--primary) 5%, transparent));
+  }
+
+  .bg-gradient-skills {
+    background-image: linear-gradient(135deg, var(--secondary), var(--background), color-mix(in oklch, var(--accent) 8%, transparent));
+  }
+
+  .bg-gradient-projects {
+    background-image: linear-gradient(135deg, color-mix(in oklch, var(--primary) 5%, transparent), var(--secondary), color-mix(in oklch, var(--accent) 10%, transparent));
+  }
+
+  .bg-gradient-about {
+    background-image: linear-gradient(135deg, var(--background), color-mix(in oklch, var(--primary) 8%, transparent), var(--secondary));
+  }
+
+  /* Optional Text Gradients */
+  .text-gradient-hero {
+    background-image: linear-gradient(to right, var(--primary), var(--accent));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .text-gradient-modern {
+    background-image: linear-gradient(to right, var(--secondary), var(--primary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+
