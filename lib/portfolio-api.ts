@@ -158,6 +158,11 @@ ${cssVariables}
   `;
 }
 
+export function getDeviconUrl(techName: any) {
+  const formattedName = techName.toLowerCase().replace(/[^a-z]/g, '');
+  return `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formattedName}/${formattedName}-original.svg`;
+}
+
 // // Client-side API functions for admin updates
 // export async function updatePortfolioData(newData: Partial<PortfolioData>): Promise<void> {
 //   const currentData = await fetchPortfolioData();
