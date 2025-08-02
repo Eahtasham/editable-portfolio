@@ -46,7 +46,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Nav sections={sectionNames} />
-      <main>
+      <main className="container mx-auto px-6 lg:px-10">
         {orderedSections.map((section, index) => (
           <section key={index} id={sectionNames[index]} className="scroll-mt-16">
             {section}

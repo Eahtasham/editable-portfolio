@@ -13,7 +13,7 @@ interface NavProps {
 }
 
 export function Nav({ sections }: NavProps) {
-  const [activeSection, setActiveSection] = useState("")
+  const [activeSection, setActiveSection] = useState("hero")
   const [visible, setVisible] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
