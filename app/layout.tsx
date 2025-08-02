@@ -9,9 +9,9 @@ import { cache } from 'react';
 const inter = Inter({ subsets: ['latin'] });
 
 
-export const revalidate = 10;; // Revalidate every day
+export const revalidate = 60;; // Revalidate every day
 
-const getCachedPortfolioData = cache(async () => {
+const getCachedPortfolioData = (async () => {
   try {
     return await fetchPortfolioData();
   } catch (error) {
