@@ -166,6 +166,12 @@ export default function AdminDashboard() {
     })
     const [selectedThemeMode, setSelectedThemeMode] = useState<"light" | "dark">("dark")
 
+        useEffect(() => {
+        if (!isAuthenticated) {
+            router.push('/admin/login');
+        }
+    }, [isAuthenticated]);
+
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
