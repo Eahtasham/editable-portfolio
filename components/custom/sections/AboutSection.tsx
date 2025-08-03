@@ -73,7 +73,7 @@ export const AboutSection = () => {
   const about = mockAbout
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto px-0 sm:px-4 lg:px-8">
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-foreground">About</h2>
       <motion.div className="w-full space-y-4" variants={containerVariants} initial="hidden" animate="visible">
         {/* Bento Grid Layout */}
@@ -81,7 +81,7 @@ export const AboutSection = () => {
           {/* Row 1: About Me Card with Hobbies & Languages - Left Side (2 columns) */}
           <motion.div variants={itemVariants} className="lg:col-span-2">
             <Card className="h-full">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-1">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                   <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   About Me
@@ -89,8 +89,8 @@ export const AboutSection = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <h3 className="text-sm sm:text-base font-medium text-foreground/90"># About Me</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{about.markdown}</p>
+                  {/* <h3 className="text-sm sm:text-base font-medium text-foreground/90"># About Me</h3> */}
+                  <p className="text-sm sm:text-sm text-muted-foreground leading-relaxed">{about.markdown}</p>
                 </div>
 
                 {/* Hobbies and Languages Section */}
@@ -103,14 +103,14 @@ export const AboutSection = () => {
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <Heart className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                            <span className="text-xs sm:text-sm font-medium text-foreground">Hobbies</span>
+                            <span className="text-sm sm:text-sm font-medium text-foreground">Hobbies</span>
                           </div>
                           <div className="flex flex-wrap gap-1.5 sm:gap-2">
                             {about.personalInfo.hobbies.map((hobby) => (
                               <Badge
                                 key={hobby}
                                 variant="outline"
-                                className="text-xs px-2 py-1 hover:bg-primary/10 hover:border-primary/30 transition-colors"
+                                className="text-sm px-2 py-1 hover:bg-primary/10 hover:border-primary/30 transition-colors"
                               >
                                 {hobby}
                               </Badge>
@@ -124,14 +124,14 @@ export const AboutSection = () => {
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <Languages className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                            <span className="text-xs sm:text-sm font-medium text-foreground">Languages</span>
+                            <span className="text-sm sm:text-sm font-medium text-foreground">Languages</span>
                           </div>
                           <div className="flex flex-wrap gap-1.5 sm:gap-2">
                             {about.personalInfo.languages.map((lang) => (
                               <Badge
                                 key={lang}
                                 variant="secondary"
-                                className="text-xs px-2 py-1 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                className="text-sm px-2 py-1 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                               >
                                 {lang}
                               </Badge>
@@ -151,7 +151,7 @@ export const AboutSection = () => {
             {/* Personal Info Card */}
             <motion.div variants={itemVariants}>
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Personal Info
@@ -164,13 +164,13 @@ export const AboutSection = () => {
                         {about.personalInfo.fullName}
                       </h3>
                       {about.personalInfo.age && (
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 text-sm sm:text-sm text-muted-foreground">
                           <Cake className="h-3 w-3 sm:h-4 sm:w-4" />
                           <span>{about.personalInfo.age} years old</span>
                         </div>
                       )}
                       {about.personalInfo.nationality && (
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 text-sm sm:text-sm text-muted-foreground">
                           <Globe className="h-3 w-3 sm:h-4 sm:w-4" />
                           <span>{about.personalInfo.nationality}</span>
                         </div>
@@ -184,14 +184,14 @@ export const AboutSection = () => {
             {/* Professional Summary Card */}
             <motion.div variants={itemVariants}>
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Professional
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm sm:text-sm text-muted-foreground leading-relaxed">
                     {about.professionalSummary}
                   </p>
                 </CardContent>
@@ -203,7 +203,7 @@ export const AboutSection = () => {
           {about.achievements && (
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Achievements
@@ -214,20 +214,20 @@ export const AboutSection = () => {
                     {about.achievements.map((achievement, index) => (
                       <motion.div
                         key={index}
-                        className="border-l-2 border-primary/30 pl-3 sm:pl-4 pb-3 sm:pb-4 last:pb-0"
+                        className="border-l-2 border-primary/30 pl-3 sm:pl-4 pb-1 sm:pb-4 last:pb-0"
                         whileHover={{ x: 4 }}
                         transition={{ duration: 0.2 }}
                       >
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-xs sm:text-sm text-foreground truncate">
+                            <h4 className="font-medium text-sm sm:text-sm text-foreground truncate">
                               {achievement.title}
                             </h4>
-                            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                            <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                               {achievement.description}
                             </p>
                           </div>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded shrink-0">
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted/50 px-2 py-1 rounded shrink-0">
                             <Calendar className="h-3 w-3" />
                             <span>{achievement.year}</span>
                           </div>
@@ -244,7 +244,7 @@ export const AboutSection = () => {
           {about.certifications && (
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <Award className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Certifications
@@ -261,7 +261,7 @@ export const AboutSection = () => {
                       >
                         <div className="flex-1 min-w-0 space-y-1">
                           <div className="flex items-center gap-2">
-                            <h4 className="font-medium text-xs sm:text-sm text-foreground truncate">{cert.name}</h4>
+                            <h4 className="font-medium text-sm sm:text-sm text-foreground truncate">{cert.name}</h4>
                             {cert.link && (
                               <a
                                 href={cert.link}
@@ -273,12 +273,12 @@ export const AboutSection = () => {
                               </a>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground">{cert.issuer}</p>
+                          <p className="text-sm text-muted-foreground">{cert.issuer}</p>
                           {cert.credentialId && (
-                            <p className="text-xs text-muted-foreground font-mono break-all">ID: {cert.credentialId}</p>
+                            <p className="text-sm text-muted-foreground font-mono break-all">ID: {cert.credentialId}</p>
                           )}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-background/50 px-2 py-1 rounded shrink-0">
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground bg-background/50 px-2 py-1 rounded shrink-0">
                           <Calendar className="h-3 w-3" />
                           <span>{cert.year}</span>
                         </div>

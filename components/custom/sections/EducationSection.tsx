@@ -32,7 +32,7 @@ export const EducationSection = () => {
   const education = data.education;
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full max-w-7xl mx-auto px-0 sm:px-4 lg:px-8 py-8">
       <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-foreground">Education</h2>
       <motion.div
         className="relative space-y-12" // Changed to space-y for vertical stacking
