@@ -31,7 +31,7 @@ export const ExperienceSection = () => {
   const { data } = usePortfolio()
   const experience = data.experience;
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full max-w-7xl mx-auto px-0 sm:px-4 lg:px-8 py-8">
       <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-foreground">Experience</h2>
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 gap-6"

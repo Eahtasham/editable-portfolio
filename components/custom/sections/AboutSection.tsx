@@ -73,7 +73,7 @@ export const AboutSection = () => {
   const about = mockAbout
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto px-0 sm:px-4 lg:px-8">
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-8 text-foreground">About</h2>
       <motion.div className="w-full space-y-4" variants={containerVariants} initial="hidden" animate="visible">
         {/* Bento Grid Layout */}
@@ -81,7 +81,7 @@ export const AboutSection = () => {
           {/* Row 1: About Me Card with Hobbies & Languages - Left Side (2 columns) */}
           <motion.div variants={itemVariants} className="lg:col-span-2">
             <Card className="h-full">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-1">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                   <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   About Me
@@ -151,7 +151,7 @@ export const AboutSection = () => {
             {/* Personal Info Card */}
             <motion.div variants={itemVariants}>
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Personal Info
@@ -184,7 +184,7 @@ export const AboutSection = () => {
             {/* Professional Summary Card */}
             <motion.div variants={itemVariants}>
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Professional
@@ -203,7 +203,7 @@ export const AboutSection = () => {
           {about.achievements && (
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Achievements
@@ -214,7 +214,7 @@ export const AboutSection = () => {
                     {about.achievements.map((achievement, index) => (
                       <motion.div
                         key={index}
-                        className="border-l-2 border-primary/30 pl-3 sm:pl-4 pb-3 sm:pb-4 last:pb-0"
+                        className="border-l-2 border-primary/30 pl-3 sm:pl-4 pb-1 sm:pb-4 last:pb-0"
                         whileHover={{ x: 4 }}
                         transition={{ duration: 0.2 }}
                       >
@@ -244,7 +244,7 @@ export const AboutSection = () => {
           {about.certifications && (
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <Card className="h-full">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-1">
                   <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                     <Award className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     Certifications

@@ -7,6 +7,7 @@ import { Menu, Moon, Sun, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { usePortfolio } from "@/context/PortfolioContext"
 
 interface NavProps {
   sections: string[]
@@ -19,6 +20,7 @@ export function Nav({ sections }: NavProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const { theme, setTheme } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
+  const {toggleThemeLocal} =usePortfolio();
 
   const { scrollY } = useScroll({
     target: ref,
@@ -66,6 +68,7 @@ export function Nav({ sections }: NavProps) {
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark")
+    toggleThemeLocal();
   }
 
   return (
@@ -170,13 +173,18 @@ export function Nav({ sections }: NavProps) {
           <div className="font-bold text-xl text-foreground">Portfolio</div>
 
           <div className="flex items-center space-x-2">
-            <button
-              onClick={toggleTheme}
-              className="rounded-md p-2 text-foreground hover:bg-muted"
-            >
-              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </button>
+
+<button
+  onClick={toggleTheme}
+  title="Toggle Theme"
+  name="theme-toggle"
+  className="relative rounded-md p-2 text-foreground hover:bg-muted"
+>
+  <Sun className="absolute h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+  {/* Invisible spacer to maintain button size */}
+  <div className="h-[1.2rem] w-[1.2rem]" />
+</button>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

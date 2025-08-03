@@ -146,6 +146,7 @@ interface PortfolioContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  toggleThemeLocal: () => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -172,6 +173,25 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleThemeLocal = () => {
+    const newMode = data.theme.currentMode === "dark" ? "light" : "dark";
+
+    // Create updated data with new theme mode
+    const updatedData: PortfolioData = {
+      ...data,
+      theme: {
+        ...data.theme,
+        currentMode: newMode
+      }
+    };
+
+    // Update local state
+    setData(updatedData);
+
+    // Apply the theme immediately
+    applyTheme(updatedData.theme);
   };
 
   const updateData = async (currentData: PortfolioData, newData: Partial<PortfolioData>): Promise<void> => {
@@ -268,7 +288,9 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
         refreshData,
         isAuthenticated,
         login,
-        logout
+        logout,
+        toggleThemeLocal,
+
       }}
     >
       {children}
