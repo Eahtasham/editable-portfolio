@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
 import { Briefcase, Calendar, MapPin, ExternalLink, Code } from "lucide-react"
 import { usePortfolio } from "@/context/PortfolioContext"
+import { AnimatedTooltip } from "../animated-tooltip"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -90,12 +91,14 @@ export const ExperienceSection = () => {
                       <Code className="h-4 w-4 text-primary" />
                       Technologies:
                     </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {exp.technologies.map((technology) => (
-                        <Badge key={technology} variant="outline" className="text-xs px-2 py-1">
-                          {technology}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 items-center">
+                      <AnimatedTooltip
+                        items={exp.technologies.map((technology, index) => ({
+                          id: index,
+                          name: technology,
+                          techName: technology, // Pass skill as techName
+                        }))}
+                      />
                     </div>
                   </div>
                 )}

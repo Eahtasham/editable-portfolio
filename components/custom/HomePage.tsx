@@ -10,6 +10,7 @@ import { SkillsSection } from "./sections/SkillsSection"
 import { ContactSection } from "./sections/ContactSection"
 import { Nav } from "./Nav"
 import { Footer } from "./Footer"
+import { ParticleBackground } from "./particle-background"
 
 export default function HomePage() {
   const { data, loading } = usePortfolio()
@@ -44,7 +45,8 @@ export default function HomePage() {
   )
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen text-foreground">
+      <ParticleBackground />
       <Nav sections={sectionNames} />
       <main className="mx-2 sm:mx-auto px-2 lg:px-10">
         {orderedSections.map((section, index) => (

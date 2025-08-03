@@ -3,6 +3,7 @@ import HomePage from '../components/custom/HomePage';
 import { fetchPortfolioData, generateThemeCSS } from '../lib/portfolio-api';
 import { CustomCursor } from '@/components/custom/custom-cursor';
 import { FloatingActions } from '@/components/custom/floating-action';
+import { ParticleBackground } from '@/components/custom/particle-background';
 
 // export const revalidate = 60;
 

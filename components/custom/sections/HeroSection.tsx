@@ -106,12 +106,14 @@ const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean
           {hero.heading}
         </BoxReveal>
       </h1>
+
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold leading-relaxed">
       <BoxReveal duration={0.5}>
 
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-muted-foreground leading-relaxed">
           {hero.subheading}
-        </h2>
       </BoxReveal>
+
+        </h2>
     </div>
 
     {/* Flip Highlights */}
