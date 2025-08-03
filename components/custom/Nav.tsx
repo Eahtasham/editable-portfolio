@@ -57,8 +57,11 @@ export function Nav({ sections }: NavProps) {
     const element = document.getElementById(sectionId)
     if (element) {
       element.scrollIntoView({ behavior: "smooth" })
+      setTimeout(() => {
+        setMobileMenuOpen(false)
+      }, 300)
     }
-    setMobileMenuOpen(false)
+    // setMobileMenuOpen(false)
   }
 
   const toggleTheme = () => {
@@ -111,7 +114,7 @@ export function Nav({ sections }: NavProps) {
               onClick={() => scrollToSection(section)}
               className={cn(
                 "relative px-4 py-2 capitalize transition-colors",
-                activeSection === section ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                activeSection === section ? "text-muted" : "text-muted-foreground hover:text-foreground"
               )}
             >
               {(hoveredIndex === idx || activeSection === section) && (
@@ -129,6 +132,8 @@ export function Nav({ sections }: NavProps) {
         <div className="relative z-20 flex-shrink-0">
           <motion.button
             onClick={toggleTheme}
+            title="Toggle Theme"
+            name="theme-toggle"
             className="flex items-center justify-center rounded-md bg-primary px-3 py-2 text-primary-foreground transition duration-200 hover:-translate-y-0.5 hover:bg-primary/90 shadow-[0_0_24px_hsl(var(--muted)/0.06),_0_1px_1px_hsl(var(--border)/0.05),_0_0_0_1px_hsl(var(--border)/0.04),_0_0_4px_hsl(var(--muted)/0.08),_0_16px_68px_hsl(var(--muted)/0.05),_0_1px_0_hsl(var(--background)/0.1)_inset]"
           >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -163,7 +168,7 @@ export function Nav({ sections }: NavProps) {
         {/* Mobile Header */}
         <div className="flex w-full flex-row items-center justify-between px-4">
           <div className="font-bold text-xl text-foreground">Portfolio</div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={toggleTheme}
@@ -172,7 +177,7 @@ export function Nav({ sections }: NavProps) {
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </button>
-            
+
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="rounded-md p-2 text-foreground hover:bg-muted"

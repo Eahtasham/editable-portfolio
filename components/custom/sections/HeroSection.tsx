@@ -35,7 +35,7 @@ export const HeroSection = () => {
   const showImage = !isPlaceholder(hero.image);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-4 overflow-hidden">
+    <section className="relative sm:min-h-screen flex items-center justify-center pt-20 sm:pt-4 overflow-hidden">
       <div className="relative container mx-auto px-0 lg:px-6 py-2">
         {showImage ? (
           // --- Grid layout when image is present ---
@@ -83,7 +83,7 @@ export const HeroSection = () => {
       </div>
 
       {/* Floating background orbs */}
-      <div className="absolute top-1/4 left-10 w-4 h-4 bg-primary/20 rounded-full animate-pulse" />
+      {/* <div className="absolute top-1/4 left-10 w-4 h-4 bg-primary/20 rounded-full animate-pulse" /> */}
       <div className="absolute bottom-1/4 right-10 w-3 h-3 bg-accent/20 rounded-full animate-pulse delay-700" />
       <div className="absolute top-1/2 left-1/4 w-1 h-1 bg-primary/30 rounded-full animate-pulse delay-1000" />
     </section>
@@ -169,7 +169,7 @@ const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean
 
             <div className="relative z-10 flex items-center justify-center w-8 h-8 group-hover:scale-130 group-hover:rotate-3 transition-transform duration-300 ease-out">
               {link.name.toLowerCase() === "github" ? (
-                <Github className="w-7 h-7 text-white transition-colors duration-300" />
+                <Github className="w-7 h-7 text-black dark:text-white transition-colors duration-300" />
               ) : (
                 <Image
                   src={getDeviconUrl(link.name)}

@@ -45,7 +45,7 @@ export default async function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <PortfolioProvider initialData={portfolioData}>
         {children}
-        <CustomCursor />
+        {/* <CustomCursor /> */}
         <Toaster position="bottom-right" />
         </PortfolioProvider>
       </body>
