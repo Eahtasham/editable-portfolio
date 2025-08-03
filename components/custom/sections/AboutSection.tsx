@@ -16,36 +16,8 @@ import {
   MapPin,
   Cake,
 } from "lucide-react"
+import { usePortfolio } from "@/context/PortfolioContext"
 
-// Mock data for preview
-const mockAbout = {
-  markdown: `I'm a passionate full-stack developer with 5+ years of experience building modern web applications. I love creating beautiful, functional, and user-friendly digital experiences.`,
-  personalInfo: {
-    fullName: "Eahtasham Umm",
-    age: 22,
-    nationality: "Indian",
-    languages: ["English", "Hindi", "Bengali", "Urdu"],
-    hobbies: ["Coding", "Designing", "Chess"],
-  },
-  professionalSummary:
-    "Creative and detail-oriented software engineer skilled in developing scalable and efficient web applications with a focus on user-centric design.",
-  achievements: [
-    {
-      title: "Hackathon Winner",
-      description: "Won first place in CodeSprint Hackathon 2023",
-      year: "2023",
-    },
-  ],
-  certifications: [
-    {
-      name: "Full Stack Web Development",
-      issuer: "Udemy",
-      year: "2022",
-      credentialId: "ABC123",
-      link: "https://udemy.com",
-    },
-  ],
-}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -69,8 +41,8 @@ const itemVariants = {
 }
 
 export const AboutSection = () => {
-  // In real implementation, this would come from usePortfolio()
-  const about = mockAbout
+  const {data} =usePortfolio();
+  const about = data.about;
 
   return (
     <div className="w-full max-w-7xl mx-auto px-0 sm:px-4 lg:px-8">

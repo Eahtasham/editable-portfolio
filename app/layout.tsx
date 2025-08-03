@@ -5,14 +5,13 @@ import { Toaster } from 'sonner';
 import { fetchPortfolioData, generateThemeCSS } from '@/lib/portfolio-api';
 import { PortfolioData, PortfolioProvider } from '@/context/PortfolioContext';
 import { cache } from 'react';
-import { CustomCursor } from '@/components/custom/custom-cursor';
 
 const inter = Inter({ subsets: ['latin'] });
 
 
-export const revalidate = 60;; // Revalidate every day
+export const revalidate = 60 * 60 * 24;; // Revalidate every day
 
-const getCachedPortfolioData = (async () => {
+const getCachedPortfolioData = cache(async () => {
   try {
     return await fetchPortfolioData();
   } catch (error) {

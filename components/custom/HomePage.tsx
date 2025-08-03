@@ -23,7 +23,6 @@ export default function HomePage() {
     )
   }
 
-  // Create ordered sections based on sectionOrder
   const sectionComponents = {
     hero: <HeroSection key="hero" />,
     about: <AboutSection key="about" />,
@@ -34,15 +33,17 @@ export default function HomePage() {
     contacts: <ContactSection key="contacts" />,
   }
 
-  // Sort sections by order
-  const orderedSections = Object.entries(data.sectionOrder)
+  // Filter out sections with order 0
+  const visibleSections = Object.entries(data.sectionOrder).filter(([, order]) => order > 0)
+
+  // Sort them by order
+  const orderedSections = visibleSections
     .sort(([, a], [, b]) => a - b)
     .map(([sectionName]) => sectionComponents[sectionName as keyof typeof sectionComponents])
 
-  const sectionNames = Object.keys(data.sectionOrder).sort(
-    (a, b) =>
-      data.sectionOrder[a as keyof typeof data.sectionOrder] - data.sectionOrder[b as keyof typeof data.sectionOrder],
-  )
+  const sectionNames = visibleSections
+    .sort(([, a], [, b]) => a - b)
+    .map(([sectionName]) => sectionName)
 
   return (
     <div className="min-h-screen text-foreground">

@@ -249,8 +249,8 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const adminEmail = "admin@example.com";
-    const adminPassword = "admin123";
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
     if (email === adminEmail && password === adminPassword) {
       setIsAuthenticated(true);
