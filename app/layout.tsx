@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 import { fetchPortfolioData, generateThemeCSS } from '@/lib/portfolio-api';
 import { PortfolioData, PortfolioProvider } from '@/context/PortfolioContext';
 import { cache } from 'react';
+import { CustomCursor } from '@/components/custom/custom-cursor';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -44,6 +45,7 @@ export default async function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <PortfolioProvider initialData={portfolioData}>
         {children}
+        <CustomCursor />
         <Toaster position="bottom-right" />
         </PortfolioProvider>
       </body>

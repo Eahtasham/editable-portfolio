@@ -1,12 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Download, MapPin } from "lucide-react";
+import { Download, Github, MapPin } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { FlipWords } from "@/components/external-ui/flip-words";
 import { getDeviconUrl } from "@/lib/portfolio-api";
 import { usePortfolio } from "@/context/PortfolioContext";
+import { BoxReveal } from "../box-reveal";
 
 const isPlaceholder = (url: string) => /placeholder/i.test(url);
 
@@ -35,10 +36,10 @@ export const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-4 overflow-hidden">
-      <div className="relative container mx-auto px-6 lg:px-6 py-2">
+      <div className="relative container mx-auto px-0 lg:px-6 py-2">
         {showImage ? (
           // --- Grid layout when image is present ---
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[80vh]">
+          <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-center min-h-[80vh]">
             {/* Left: Text */}
             <HeroContent hero={hero} />
 
@@ -92,35 +93,48 @@ export const HeroSection = () => {
 const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean }) => (
   <div className={`space-y-8 ${centered ? "text-center items-center" : ""}`}>
     {/* Headings */}
-    <div className="space-y-4">
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight tracking-tight">
-        {hero.greeting}
+    <div className="space-y-6">
+      <BoxReveal duration={0.5}>
+
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight tracking-tight">
+          {hero.greeting}
+        </h1>
+      </BoxReveal>
+      <h1 className="text-5xl xl:text-6xl text-primary font-extrabold leading-tight tracking-tight">
+        {/* <GradientText>{hero.heading}</GradientText> */}
+        <BoxReveal duration={0.5}>
+          {hero.heading}
+        </BoxReveal>
       </h1>
-      <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight tracking-tight">
-        <GradientText>{hero.heading}</GradientText>
-      </h1>
-      <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-muted-foreground leading-relaxed">
-        {hero.subheading}
-      </h2>
+      <BoxReveal duration={0.5}>
+
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-muted-foreground leading-relaxed">
+          {hero.subheading}
+        </h2>
+      </BoxReveal>
     </div>
 
     {/* Flip Highlights */}
     {hero.highlights?.length > 0 && (
-      <h3 className="text-2xl font-semibold text-foreground/90">
-        Expertise in:{" "}
-        <FlipWords
-          words={hero.highlights}
-          duration={1500}
-          className="bg-gradient-to-r from-primary to-accent bg-clip-text text-primary text-2xl font-semibold"
-        />
-      </h3>
+      <BoxReveal duration={0.5}>
+
+        <h3 className="text-xl font-semibold text-foreground/90">
+          Expertise in:{" "}
+          <FlipWords
+            words={hero.highlights}
+            duration={1500}
+            className="bg-gradient-to-r from-primary to-accent bg-clip-text text-primary text-xl font-semibold"
+          />
+        </h3>
+      </BoxReveal>
     )}
+
 
     {/* Buttons */}
     <div className={`flex flex-col sm:flex-row gap-4 ${centered ? "justify-center" : ""}`}>
       <Button
         size="lg"
-        className="px-8 py-4 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
+        className="px-8 py-4 bg-primary hover:bg-primary/80 shadow-lg hover:shadow-xl text-lg"
       >
         {hero.cta}
       </Button>
@@ -129,7 +143,7 @@ const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean
           variant="outline"
           size="lg"
           asChild
-          className="px-8 py-4 border-2 hover:bg-muted/50 transition-all duration-300 text-lg"
+          className="px-8 py-4 border-2 hover:bg-muted/50 text-lg"
         >
           <a href={hero.downloadCV} download className="flex items-center gap-2">
             <Download className="h-5 w-5" />
@@ -142,7 +156,7 @@ const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean
     {/* Social Links */}
     {hero.socialLinks?.length > 0 && (
       <div className={`flex gap-3 flex-wrap ${centered ? "justify-center" : ""}`}>
-        {hero.socialLinks.map((link:any, index:any) => (
+        {hero.socialLinks.map((link: any, index: number) => (
           <button
             key={link.name}
             onClick={() => window.open(link.url, "_blank", "noopener,noreferrer")}
@@ -154,23 +168,27 @@ const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             <div className="relative z-10 flex items-center justify-center w-8 h-8 group-hover:scale-130 group-hover:rotate-3 transition-transform duration-300 ease-out">
-              <Image
-                src={getDeviconUrl(link.name)}
-                width={28}
-                height={28}
-                alt={`${link.name} icon`}
-                className="object-contain filter brightness-75 group-hover:brightness-100 group-hover:drop-shadow-sm transition-all duration-300"
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  const container = target.parentElement;
-                  target.style.display = "none";
-                  const fallback = document.createElement("div");
-                  fallback.className =
-                    "text-sm font-semibold text-muted-foreground group-hover:text-foreground transition-colors duration-300";
-                  fallback.textContent = link.name.charAt(0).toUpperCase();
-                  container?.appendChild(fallback);
-                }}
-              />
+              {link.name.toLowerCase() === "github" ? (
+                <Github className="w-7 h-7 text-white transition-colors duration-300" />
+              ) : (
+                <Image
+                  src={getDeviconUrl(link.name)}
+                  width={28}
+                  height={28}
+                  alt={`${link.name} icon`}
+                  className="object-contain brightness-110 group-hover:brightness-100 group-hover:drop-shadow-sm transition-all duration-300"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const container = target.parentElement;
+                    target.style.display = "none";
+                    const fallback = document.createElement("div");
+                    fallback.className =
+                      "text-sm font-semibold text-muted-foreground group-hover:text-foreground transition-colors duration-300";
+                    fallback.textContent = link.name.charAt(0).toUpperCase();
+                    container?.appendChild(fallback);
+                  }}
+                />
+              )}
             </div>
 
             <div className="absolute inset-0 rounded-xl border border-primary/0 group-hover:border-primary/30 group-hover:animate-pulse transition-all duration-300" />
