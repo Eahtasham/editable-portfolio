@@ -68,7 +68,7 @@ export const ContactSection = () => {
     message: "",
   })
   const [copied, setCopied] = useState<string | null>(null)
-  const [captcha, setCaptcha] = useState(generateCaptcha())
+  const [captcha, setCaptcha] = useState<{ question: string; answer: number } | null>(null)
   const [captchaInput, setCaptchaInput] = useState("")
   const [captchaError, setCaptchaError] = useState("")
   const formRef = useRef<HTMLFormElement>(null)
@@ -83,6 +83,10 @@ export const ContactSection = () => {
     setCaptchaError("") // Clear error when user types
   }
 
+    useEffect(() => {
+    setCaptcha(generateCaptcha())
+  }, [])
+
   const refreshCaptcha = () => {
     setCaptcha(generateCaptcha())
     setCaptchaInput("")
@@ -91,7 +95,7 @@ export const ContactSection = () => {
 
   const validateCaptcha = () => {
     const userAnswer = parseInt(captchaInput, 10)
-    if (isNaN(userAnswer) || userAnswer !== captcha.answer) {
+    if (isNaN(userAnswer) || userAnswer !== captcha?.answer) {
       setCaptchaError("Incorrect answer. Please try again.")
       return false
     }
@@ -307,7 +311,7 @@ export const ContactSection = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-sm font-medium bg-muted px-3 py-2 rounded border">
-                          What is {captcha.question} ?
+                          What is {captcha?.question} ?
                         </span>
                         <Button
                           type="button"
