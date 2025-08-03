@@ -278,7 +278,7 @@ export const FloatingActions = () => {
           <DialogHeader>
             <DialogTitle className="text-foreground flex items-center gap-2">
               <Bot className="h-5 w-5" />
-              Chat with {data.about.personalInfo?.fullName}'s AI Assistant
+              Chat with {data.about.personalInfo?.fullName}&apos; s AI Assistant
             </DialogTitle>
           </DialogHeader>
 
