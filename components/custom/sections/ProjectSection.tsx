@@ -29,7 +29,7 @@ const itemVariants = {
 }
 
 export const ProjectSection = () => {
-  const {data} =usePortfolio();
+  const { data } = usePortfolio();
   const projects = data.projects
 
   const getStatusBadge = (status: string) => {
@@ -98,18 +98,20 @@ export const ProjectSection = () => {
                 </CardDescription>
                 {project.tech.length > 0 && (
                   <div className="pt-2">
-                    <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                      <Code className="h-4 w-4 text-primary" />
-                      Technologies:
-                    </h4>
-                    <div className="flex flex-wrap gap-x-4 gap-y-2 items-center">
-                      <AnimatedTooltip
-                        items={project.tech.map((tech, index) => ({
-                          id: index,
-                          name: tech,
-                          techName: tech, // Pass skill as techName
-                        }))}
-                      />
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h4 className="text-sm font-medium text-foreground flex items-center gap-2 whitespace-nowrap">
+                        <Code className="h-4 w-4 text-primary" />
+                        Technologies:
+                      </h4>
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <AnimatedTooltip
+                          items={project.tech.map((tech, index) => ({
+                            id: index,
+                            name: tech,
+                            techName: tech, // Pass skill as techName
+                          }))}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}

@@ -87,18 +87,20 @@ export const ExperienceSection = () => {
                 <p className="text-sm text-muted-foreground leading-relaxed">{exp.description}</p>
                 {exp.technologies && exp.technologies.length > 0 && (
                   <div className="pt-2">
-                    <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                      <Code className="h-4 w-4 text-primary" />
-                      Technologies:
-                    </h4>
-                    <div className="flex flex-wrap gap-x-4 gap-y-2 items-center">
-                      <AnimatedTooltip
-                        items={exp.technologies.map((technology, index) => ({
-                          id: index,
-                          name: technology,
-                          techName: technology, // Pass skill as techName
-                        }))}
-                      />
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h4 className="text-sm font-medium text-foreground flex items-center gap-2 whitespace-nowrap">
+                        <Code className="h-4 w-4 text-primary" />
+                        Technologies:
+                      </h4>
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <AnimatedTooltip
+                          items={exp.technologies.map((technology, index) => ({
+                            id: index,
+                            name: technology,
+                            techName: technology,
+                          }))}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}

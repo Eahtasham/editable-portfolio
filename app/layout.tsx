@@ -28,24 +28,24 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
 
-    const portfolioData = await getCachedPortfolioData();
-    
-    const themeStyles = portfolioData.theme.styles[portfolioData.theme.currentMode];
-    const initialThemeStyles = generateThemeCSS(themeStyles, portfolioData.theme.currentMode);
+  const portfolioData = await getCachedPortfolioData();
+
+  const themeStyles = portfolioData.theme.styles[portfolioData.theme.currentMode];
+  const initialThemeStyles = generateThemeCSS(themeStyles, portfolioData.theme.currentMode);
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-              <style 
-        dangerouslySetInnerHTML={{ 
-          __html: initialThemeStyles 
-        }} 
-      />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: initialThemeStyles
+          }}
+        />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <PortfolioProvider initialData={portfolioData}>
-        {children}
-        {/* <CustomCursor /> */}
-        <Toaster position="bottom-right" />
+          {children}
+          {/* <CustomCursor /> */}
+          <Toaster position="bottom-right" />
         </PortfolioProvider>
       </body>
     </html>
@@ -55,10 +55,13 @@ export default async function RootLayout({
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const portfolioData = await getCachedPortfolioData();
-    
+
     return {
       title: portfolioData?.hero?.heading || 'Portfolio',
       description: portfolioData?.hero?.subheading || 'Professional Portfolio',
+      icons: {
+        icon: '/favicon.png',
+      },
       // Add more SEO metadata
       openGraph: {
         title: portfolioData?.hero?.heading || 'Portfolio',

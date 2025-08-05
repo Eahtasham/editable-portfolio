@@ -40,7 +40,7 @@ export const AnimatedTooltip = ({
     <>
       {items.map((item, idx) => (
         <div
-          className="-ml-2 first:ml-0 group relative flex items-center justify-center"
+          className="-ml-1 first:ml-0 group relative flex items-center justify-center overla"
           key={item.id}
           onMouseEnter={() => setHoveredIndex(item.id)}
           onMouseLeave={() => setHoveredIndex(null)}
@@ -77,8 +77,8 @@ export const AnimatedTooltip = ({
           </AnimatePresence>
           <TechIcon
             techName={item.techName}
-            size={40}
-            className="relative h-10 w-10 rounded-full border-2 border-border object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105"
+            size={30}
+            className="relative h-8 w-8 rounded-full border-2 border-border object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105"
           />
         </div>
       ))}

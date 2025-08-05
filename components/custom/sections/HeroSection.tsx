@@ -77,7 +77,7 @@ export const HeroSection = () => {
         ) : (
           // --- Centered layout when image is absent ---
           <div className="flex flex-col justify-center items-center text-center min-h-[90vh] max-w-3xl mx-auto space-y-8">
-            <HeroContent hero={hero} centered />
+            <HeroContent hero={hero} centered={true} />
           </div>
         )}
       </div>
@@ -91,9 +91,9 @@ export const HeroSection = () => {
 };
 
 const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean }) => (
-  <div className={`space-y-8 ${centered ? "text-center items-center" : ""}`}>
+  <div className={`space-y-8 ${centered ? "text-center items-center flex flex-col" : ""}`}>
     {/* Headings */}
-    <div className="space-y-6">
+    <div className={`space-y-6 ${centered ? "flex flex-col items-center text-center" : ""}`}>
       <BoxReveal duration={0.5}>
 
         <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight tracking-tight">
@@ -107,13 +107,13 @@ const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean
         </BoxReveal>
       </h1>
 
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold leading-relaxed">
-      <BoxReveal duration={0.5}>
+      <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold leading-relaxed">
+        <BoxReveal duration={0.5}>
 
           {hero.subheading}
-      </BoxReveal>
+        </BoxReveal>
 
-        </h2>
+      </h2>
     </div>
 
     {/* Flip Highlights */}
