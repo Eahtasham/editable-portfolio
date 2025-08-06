@@ -138,7 +138,6 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
   } catch (error) {
     console.error('Error fetching portfolio data:', error);
     console.log('Falling back to default data');
-    alert("Please Refresh the Page");
     return defaultData;
   }
 }
