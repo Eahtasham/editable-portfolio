@@ -8,6 +8,7 @@ import { FlipWords } from "@/components/external-ui/flip-words";
 import { getDeviconUrl } from "@/lib/portfolio-api";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { BoxReveal } from "../box-reveal";
+import Link from "next/link";
 
 const isPlaceholder = (url: string) => /placeholder/i.test(url);
 
@@ -33,6 +34,7 @@ export const HeroSection = () => {
   const { data } = usePortfolio();
   const hero = data.hero;
   const showImage = !isPlaceholder(hero.image);
+  // console.log(data.contacts.email)
 
   return (
     <section className="relative sm:min-h-screen flex items-center justify-center pt-20 sm:pt-4 overflow-hidden">
@@ -41,7 +43,7 @@ export const HeroSection = () => {
           // --- Grid layout when image is present ---
           <div className="grid lg:grid-cols-2 gap-4 lg:gap-16 items-center min-h-[80vh]">
             {/* Left: Text */}
-            <HeroContent hero={hero} />
+            <HeroContent hero={hero} email={data.contacts.email} />
 
             {/* Right: Profile Image */}
             <div className="relative justify-center lg:justify-end order-1 lg:order-2 hidden lg:block lg:pl-20">
@@ -77,7 +79,7 @@ export const HeroSection = () => {
         ) : (
           // --- Centered layout when image is absent ---
           <div className="flex flex-col justify-center items-center text-center min-h-[90vh] max-w-3xl mx-auto space-y-8">
-            <HeroContent hero={hero} centered={true} />
+            <HeroContent hero={hero} centered={true} email={data.contacts.email} />
           </div>
         )}
       </div>
@@ -90,7 +92,7 @@ export const HeroSection = () => {
   );
 };
 
-const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean }) => (
+const HeroContent = ({ hero, centered = false, email }: { hero: any; centered?: boolean; email: any }) => (
   <div className={`space-y-8 ${centered ? "text-center items-center flex flex-col" : ""}`}>
     {/* Headings */}
     <div className={`space-y-6 ${centered ? "flex flex-col items-center text-center" : ""}`}>
@@ -134,12 +136,14 @@ const HeroContent = ({ hero, centered = false }: { hero: any; centered?: boolean
 
     {/* Buttons */}
     <div className={`flex flex-col sm:flex-row gap-4 ${centered ? "justify-center" : ""}`}>
+      <Link href={`mailto:${email}`} target="_blank" rel="noopener noreferrer">
       <Button
         size="lg"
         className="px-8 py-4 bg-primary hover:bg-primary/80 shadow-lg hover:shadow-xl text-lg"
       >
         {hero.cta}
       </Button>
+      </Link>
       {hero.downloadCV && (
         <Button
           variant="outline"

@@ -138,6 +138,7 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
   } catch (error) {
     console.error('Error fetching portfolio data:', error);
     console.log('Falling back to default data');
+    alert("Please Refresh the Page");
     return defaultData;
   }
 }
@@ -159,7 +160,7 @@ ${cssVariables}
 }
 
 export function getDeviconUrl(techName: any) {
-  const formattedName = techName.toLowerCase().replace(/[^a-z]/g, '');
+  const formattedName = techName.toLowerCase().replace(/[^a-z0-9]/g, '');
   return `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formattedName}/${formattedName}-original.svg`;
 }
 
