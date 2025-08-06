@@ -162,7 +162,7 @@ export const ContactSection = () => {
     {
       name: "Twitter",
       icon: Twitter,
-      href: contacts.twitter ? `https://twitter.com/${contacts.twitter}` : undefined,
+      href: contacts.twitter,
       value: contacts.twitter,
       type: "link",
       visible: !!contacts.twitter,
@@ -170,7 +170,7 @@ export const ContactSection = () => {
     {
       name: "GitHub",
       icon: Github,
-      href: contacts.github ? `https://github.com/${contacts.github}` : undefined,
+      href: contacts.github,
       value: contacts.github,
       type: "link",
       visible: !!contacts.github,
@@ -178,7 +178,7 @@ export const ContactSection = () => {
     {
       name: "LinkedIn",
       icon: Linkedin,
-      href: contacts.linkedin ? `https://www.linkedin.com/in/${contacts.linkedin}` : undefined,
+      href: contacts.linkedin,
       value: contacts.linkedin,
       type: "link",
       visible: !!contacts.linkedin,
@@ -194,7 +194,7 @@ export const ContactSection = () => {
     {
       name: "Telegram",
       icon: Send,
-      href: contacts.telegram ? `https://t.me/${contacts.telegram}` : undefined,
+      href: contacts.telegram,
       value: contacts.telegram,
       type: "link",
       visible: !!contacts.telegram,
