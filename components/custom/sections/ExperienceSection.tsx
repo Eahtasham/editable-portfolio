@@ -167,7 +167,7 @@ export const ExperienceSection = () => {
                       {exp.responsibilities.map((responsibility, index) => (
                         <motion.li
                           key={index}
-                          className="text-xs text-muted-foreground flex items-start gap-2"
+                          className="text-sm text-muted-foreground flex items-start gap-2"
                           variants={listItemVariants}
                         >
                           <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full mt-1.5 flex-shrink-0" />
@@ -193,7 +193,7 @@ export const ExperienceSection = () => {
                       {exp.achievements.map((achievement, index) => (
                         <motion.li
                           key={index}
-                          className="text-xs text-muted-foreground flex items-start gap-2"
+                          className="text-sm text-muted-foreground flex items-start gap-2"
                           variants={listItemVariants}
                         >
                           <div className="w-1.5 h-1.5 bg-muted-foreground rounded-full mt-1.5 flex-shrink-0" />
