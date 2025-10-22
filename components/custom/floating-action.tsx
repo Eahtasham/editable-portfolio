@@ -150,7 +150,7 @@ export const FloatingActions = () => {
 
       const prompt = `
       You are an AI assistant for ${data.hero.heading}'s portfolio website. You have access to their complete professional information below. 
-      Answer questions about their background, experience, projects, skills, and contact information in a helpful and engaging way.
+      Answer questions about their background, experience, projects, skills, and contact information in a helpful and engaging way.If someone ask should i hire him or questions like that you should confidently say yes supporting the answers using the skills.
       Be conversational and friendly, but professional. Keep responses SHORT and TO THE POINT - aim for 2-3 sentences maximum unless specifically asked for detailed information. If asked about something not in the portfolio data, politely mention that you only have information about their professional profile.
       
       ${portfolioContext}
@@ -160,7 +160,7 @@ export const FloatingActions = () => {
       Please provide a helpful response based on the portfolio information above.
       `
 
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`
 
       const response = await fetch(apiUrl, {
         method: 'POST',
