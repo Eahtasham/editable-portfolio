@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 
 export const revalidate = 60 * 60 * 24;; // Revalidate every day
+// export const revalidate = 10;
 
 const getCachedPortfolioData = cache(async () => {
   try {
@@ -60,18 +61,32 @@ export async function generateMetadata(): Promise<Metadata> {
       title: portfolioData?.hero?.heading || 'Portfolio',
       description: portfolioData?.hero?.subheading || 'Professional Portfolio',
       icons: {
-        icon: '/favicon.png',
+        icon: portfolioData?.hero?.image || '/favicon.png',
       },
       // Add more SEO metadata
       openGraph: {
         title: portfolioData?.hero?.heading || 'Portfolio',
         description: portfolioData?.hero?.subheading || 'Professional Portfolio',
         type: 'website',
+        images: [
+          {
+            url: portfolioData?.hero?.image || '/favicon.png',
+            width: 800,
+            height: 600
+          }
+        ]
       },
       twitter: {
         card: 'summary_large_image',
         title: portfolioData?.hero?.heading || 'Portfolio',
         description: portfolioData?.hero?.subheading || 'Professional Portfolio',
+        images: [
+          {
+            url: portfolioData?.hero?.image || '/favicon.png',
+            width: 800,
+            height: 600
+          }
+        ]
       },
     };
   } catch (error) {

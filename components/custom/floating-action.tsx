@@ -137,70 +137,54 @@ export const FloatingActions = () => {
     `
   }
 
-  // Call Google Gemini API
-  const callGeminiAPI = async (userMessage: string) => {
+  // Call API route instead of direct Gemini API
+  const callChatAPI = async (userMessage: string) => {
     try {
-      const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY
-
-      if (!API_KEY) {
-        throw new Error('Gemini API key not found')
-      }
-
       const portfolioContext = createPortfolioContext()
 
-      const prompt = `
-      You are an AI assistant for ${data.hero.heading}'s portfolio website. You have access to their complete professional information below. 
-      Answer questions about their background, experience, projects, skills, and contact information in a helpful and engaging way.
-      Be conversational and friendly, but professional. Keep responses SHORT and TO THE POINT - aim for 2-3 sentences maximum unless specifically asked for detailed information. If asked about something not in the portfolio data, politely mention that you only have information about their professional profile.
-      
-      ${portfolioContext}
-      
-      User Question: ${userMessage}
-      
-      Please provide a helpful response based on the portfolio information above.
-      `
-
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          }
-        })
+          message: userMessage,
+          portfolioContext: portfolioContext,
+        }),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded. Please wait a moment before trying again.')
+        }
+        throw new Error(data.error || 'Failed to get response')
       }
 
-      const result = await response.json()
-
-      if (result.candidates && result.candidates[0] && result.candidates[0].content) {
-        return result.candidates[0].content.parts[0].text
-      } else {
-        throw new Error('Unexpected response format from Gemini API')
-      }
+      return data.message
     } catch (error) {
-      console.error('Error calling Gemini API:', error)
-      return "I apologize, but I'm having trouble connecting to my AI services right now. Please try again later, or feel free to contact me directly through the contact information on this website."
+      console.error('Error calling chat API:', error)
+      if (error instanceof Error) {
+        return error.message
+      }
+      return "I apologize, but I'm having trouble connecting right now. Please try again later."
     }
   }
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "" || isLoading) return
+
+    // Client-side validation
+    if (inputMessage.length > 500) {
+      const errorMessage: ChatMessage = {
+        role: "bot",
+        content: "Please keep your message under 500 characters.",
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+      return
+    }
 
     const newUserMessage: ChatMessage = {
       role: "user",
@@ -213,7 +197,7 @@ export const FloatingActions = () => {
     setIsLoading(true)
 
     try {
-      const botResponse = await callGeminiAPI(newUserMessage.content)
+      const botResponse = await callChatAPI(newUserMessage.content)
 
       const newBotMessage: ChatMessage = {
         role: "bot",
@@ -225,7 +209,7 @@ export const FloatingActions = () => {
     } catch (error) {
       const errorMessage: ChatMessage = {
         role: "bot",
-        content: "I apologize, but I encountered an error. Please try again or contact me directly through the website.",
+        content: "I apologize, but I encountered an error. Please try again.",
         timestamp: new Date()
       }
 
