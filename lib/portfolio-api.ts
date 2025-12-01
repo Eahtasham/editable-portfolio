@@ -123,7 +123,7 @@ export async function fetchPortfolioData(): Promise<PortfolioData> {
         "X-Master-Key": API_KEY,
       },
       // Important for ISR: Don't cache this request
-      next: { revalidate: 0 }
+      // next: { revalidate: 0 }
     });
 
     if (!res.ok) {

@@ -8,6 +8,7 @@ import { useTheme } from "next-themes"
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { usePortfolio } from "@/context/PortfolioContext"
+import { ThemeToggleButton, useThemeTransition } from "../ui/shadcn-io/theme-toggle-button"
 
 interface NavProps {
   sections: string[]
@@ -20,7 +21,8 @@ export function Nav({ sections }: NavProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const { theme, setTheme } = useTheme()
   const ref = useRef<HTMLDivElement>(null)
-  const {toggleThemeLocal} =usePortfolio();
+  const { toggleThemeLocal } = usePortfolio();
+  const {startTransition} =useThemeTransition();
 
   const { scrollY } = useScroll({
     target: ref,
@@ -67,6 +69,10 @@ export function Nav({ sections }: NavProps) {
   }
 
   const toggleTheme = () => {
+    startTransition(() => {});
+    setTimeout(() => {
+      
+    }, 1000);
     setTheme(theme === "dark" ? "light" : "dark")
     toggleThemeLocal();
   }
@@ -133,7 +139,7 @@ export function Nav({ sections }: NavProps) {
 
         {/* Theme Toggle */}
         <div className="relative z-20 flex-shrink-0">
-          <motion.button
+          {/* <motion.button
             onClick={toggleTheme}
             title="Toggle Theme"
             name="theme-toggle"
@@ -141,7 +147,13 @@ export function Nav({ sections }: NavProps) {
           >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          </motion.button>
+          </motion.button> */}
+          <ThemeToggleButton
+          theme={theme as "light" | "dark"}
+          onClick={toggleTheme}
+          variant="circle-blur"
+          start="top-right"
+        />
         </div>
       </motion.div>
 
@@ -174,18 +186,12 @@ export function Nav({ sections }: NavProps) {
 
           <div className="flex items-center space-x-2">
 
-<button
-  onClick={toggleTheme}
-  title="Toggle Theme"
-  name="theme-toggle"
-  className="relative rounded-md p-2 text-foreground hover:bg-muted"
->
-  <Sun className="absolute h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-  {/* Invisible spacer to maintain button size */}
-  <div className="h-[1.2rem] w-[1.2rem]" />
-</button>
-
+          <ThemeToggleButton
+          theme={theme as "light" | "dark"}
+          onClick={toggleTheme}
+          variant="circle-blur"
+          start="top-right"
+        />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="rounded-md p-2 text-foreground hover:bg-muted"
