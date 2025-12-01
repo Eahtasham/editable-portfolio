@@ -84,7 +84,7 @@ export const ExperienceSection = () => {
                           alt={`${exp.company} logo`}
                           width={40}
                           height={40}
-                          className="w-10 h-10 rounded-lg object-contain bg-background p-1 border border-border/50"
+                          className="w-10 h-10 rounded-lg object-contain bg-white p-1 border border-border/50"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                           }}

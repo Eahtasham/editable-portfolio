@@ -1,3 +1,4 @@
+import { AdminNotification } from '@/components/custom/admin-notification';
 import HomePage from '../components/custom/HomePage';
 import { CustomCursor } from '@/components/custom/custom-cursor';
 import { FloatingActions } from '@/components/custom/floating-action';
@@ -11,6 +12,7 @@ export default async function Page() {
       <HomePage />
       <CustomCursor />
       <FloatingActions />
+      <AdminNotification />
     </>
   );
 }
