@@ -41,6 +41,7 @@ export default async function RootLayout({
             __html: initialThemeStyles
           }}
         />
+        <script src="https://onescript.xyz/widget.js" data-id="92c5db84-0264-480f-b32c-a9d0c555ae44"></script>
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <PortfolioProvider initialData={portfolioData}>
