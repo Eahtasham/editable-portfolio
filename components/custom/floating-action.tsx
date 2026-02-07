@@ -247,7 +247,7 @@ export const FloatingActions = () => {
       </AnimatePresence>
 
       {/* Chatbot Button */}
-      <Dialog>
+      {/* <Dialog>
         <DialogTrigger asChild>
           <Button
             size="icon"
@@ -267,7 +267,6 @@ export const FloatingActions = () => {
           </DialogHeader>
 
           <div className="flex flex-col h-[500px]">
-            {/* Messages Area - Fixed height with proper scrolling */}
             <div className="flex-1 min-h-0 mb-4">
               <ScrollArea className="h-full rounded-md border bg-background/50 p-4">
                 <div className="space-y-4">
@@ -300,7 +299,6 @@ export const FloatingActions = () => {
                     </div>
                   ))}
 
-                  {/* Loading Animation */}
                   {isLoading && (
                     <div className="flex w-full justify-start">
                       <div className="flex items-start gap-2 max-w-[80%]">
@@ -325,7 +323,6 @@ export const FloatingActions = () => {
               </ScrollArea>
             </div>
 
-            {/* Input Area - Fixed at bottom */}
             <div className="flex-shrink-0">
               <div className="flex gap-2">
                 <Input
@@ -357,7 +354,7 @@ export const FloatingActions = () => {
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   )
 }
