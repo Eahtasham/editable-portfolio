@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 import { fetchPortfolioData, generateThemeCSS } from '@/lib/portfolio-api';
 import { PortfolioData, PortfolioProvider } from '@/context/PortfolioContext';
 import { cache } from 'react';
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -41,7 +42,7 @@ export default async function RootLayout({
             __html: initialThemeStyles
           }}
         />
-        <script src="https://onescript.xyz/widget.js" data-id="92c5db84-0264-480f-b32c-a9d0c555ae44"></script>
+        <Script src="https://onescript.xyz/widget.js" data-id="92c5db84-0264-480f-b32c-a9d0c555ae44" strategy="afterInteractive"></Script>
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <PortfolioProvider initialData={portfolioData}>
