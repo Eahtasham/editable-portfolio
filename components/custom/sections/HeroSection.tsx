@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Download, Github, MapPin } from "lucide-react";
+import { Download, Github, MapPin, Twitter } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { FlipWords } from "@/components/external-ui/flip-words";
@@ -137,12 +137,12 @@ const HeroContent = ({ hero, centered = false, email }: { hero: any; centered?: 
     {/* Buttons */}
     <div className={`flex flex-col sm:flex-row gap-4 ${centered ? "justify-center" : ""}`}>
       <Link href={`mailto:${email}`} target="_blank" rel="noopener noreferrer">
-      <Button
-        size="lg"
-        className="px-8 py-4 bg-primary hover:bg-primary/80 shadow-lg hover:shadow-xl text-lg"
-      >
-        {hero.cta}
-      </Button>
+        <Button
+          size="lg"
+          className="px-8 py-4 bg-primary hover:bg-primary/80 shadow-lg hover:shadow-xl text-lg"
+        >
+          {hero.cta}
+        </Button>
       </Link>
       {hero.downloadCV && (
         <Button
@@ -175,7 +175,9 @@ const HeroContent = ({ hero, centered = false, email }: { hero: any; centered?: 
 
             <div className="relative z-10 flex items-center justify-center w-8 h-8 group-hover:scale-130 group-hover:rotate-3 transition-transform duration-300 ease-out">
               {link.name.toLowerCase() === "github" ? (
-                <Github className="w-7 h-7 text-black dark:text-white transition-colors duration-300" />
+                <Github className="w-7 h-7 text-foreground transition-colors duration-300" />
+              ) : link.name.toLowerCase() === "x" || link.name.toLowerCase() === "twitter" ? (
+                <Twitter className="w-7 h-7 text-foreground transition-colors duration-300" />
               ) : (
                 <Image
                   src={getDeviconUrl(link.name)}

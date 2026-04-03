@@ -28,6 +28,7 @@ import {
     GraduationCap,
     Eye,
     EyeOff,
+    FileText,
 } from "lucide-react"
 import { updatePortfolioData } from "../../lib/portfolio-api"
 import type { PortfolioData } from "../../context/PortfolioContext"
@@ -38,6 +39,7 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
     useSortable,
+    arrayMove,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { formatHex, converter } from "culori"
@@ -97,6 +99,7 @@ interface SectionOrder {
     skills: number
     education: number
     contacts: number
+    blog: number
 }
 
 interface SortableItemProps {
@@ -149,6 +152,42 @@ const SortableItem: React.FC<SortableItemProps> = ({ id, section, order, isHidde
     )
 }
 
+// Sortable wrapper for project cards
+const SortableProjectCard: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        position: "relative" as const,
+        zIndex: isDragging ? 50 : "auto" as const,
+    }
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {children}
+        </div>
+    )
+}
+
+// Sortable wrapper for experience cards
+const SortableExperienceCard: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        position: "relative" as const,
+        zIndex: isDragging ? 50 : "auto" as const,
+    }
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {children}
+        </div>
+    )
+}
+
 export default function AdminDashboard() {
     const { isAuthenticated, data: portfolioData, refreshData } = usePortfolio()
     const router = useRouter()
@@ -163,6 +202,7 @@ export default function AdminDashboard() {
         skills: 5,
         education: 6,
         contacts: 7,
+        blog: 8,
     })
     const [selectedThemeMode, setSelectedThemeMode] = useState<"light" | "dark">("dark")
 
@@ -619,7 +659,7 @@ export default function AdminDashboard() {
         )
     }
 
-    // Drag and drop handler
+    // Drag and drop handler for sections
     const handleDragEnd = (event: any) => {
         const { active, over } = event
         if (!over || active.id === over.id) return
@@ -644,6 +684,34 @@ export default function AdminDashboard() {
 
         setSectionOrder(newOrder)
         setIsDirty(true)
+    }
+
+    // Drag and drop handler for projects
+    const handleProjectDragEnd = (event: any) => {
+        const { active, over } = event
+        if (!editedData || !over || active.id === over.id) return
+
+        const oldIndex = editedData.projects.findIndex((p) => p.id === active.id)
+        const newIndex = editedData.projects.findIndex((p) => p.id === over.id)
+
+        if (oldIndex === -1 || newIndex === -1) return
+
+        const newProjects = arrayMove(editedData.projects, oldIndex, newIndex)
+        updateField(["projects"], newProjects)
+    }
+
+    // Drag and drop handler for experience
+    const handleExperienceDragEnd = (event: any) => {
+        const { active, over } = event
+        if (!editedData || !over || active.id === over.id) return
+
+        const oldIndex = editedData.experience.findIndex((e) => e.id === active.id)
+        const newIndex = editedData.experience.findIndex((e) => e.id === over.id)
+
+        if (oldIndex === -1 || newIndex === -1) return
+
+        const newExperience = arrayMove(editedData.experience, oldIndex, newIndex)
+        updateField(["experience"], newExperience)
     }
 
     // Theme parsing function
@@ -809,7 +877,7 @@ export default function AdminDashboard() {
                 <div className="w-full">
                     <Tabs defaultValue="ordering" className="space-y-4">
                         <div className="overflow-x-auto">
-                            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 bg-muted lg:min-w-max">
+                            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-10 bg-muted lg:min-w-max">
                                 <TabsTrigger value="ordering" className="flex flex-col sm:flex-row items-center gap-1">
                                     <GripVertical className="h-4 w-4" />
                                     <span className="text-xs sm:text-sm hidden sm:inline">Ordering</span>
@@ -856,6 +924,13 @@ export default function AdminDashboard() {
                                 >
                                     <Mail className="h-3 w-3 lg:h-4 lg:w-4" />
                                     <span className="text-xs sm:text-sm hidden sm:inline">Contacts</span>
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="blog"
+                                    className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm"
+                                >
+                                    <FileText className="h-3 w-3 lg:h-4 lg:w-4" />
+                                    <span className="text-xs sm:text-sm hidden sm:inline">Blog</span>
                                 </TabsTrigger>
                                 <TabsTrigger value="theme" className="flex flex-col sm:flex-row items-center gap-1 text-xs lg:text-sm">
                                     <Palette className="h-4 w-4" />
@@ -1597,11 +1672,20 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
 
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleProjectDragEnd}>
+                                    <SortableContext
+                                        items={editedData.projects.map((p) => p.id)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
                                 {editedData.projects.map((project, index) => (
-                                    <Card key={project.id} className="bg-card text-card-foreground border-border">
+                                    <SortableProjectCard key={project.id} id={project.id}>
+                                    <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <div className="flex items-center justify-between">
-                                                <CardTitle className="text-base">Project {index + 1}</CardTitle>
+                                                <div className="flex items-center gap-2">
+                                                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                                                    <CardTitle className="text-base">Project {index + 1}</CardTitle>
+                                                </div>
                                                 <Button
                                                     onClick={() => removeProject(project.id)}
                                                     variant="outline"
@@ -1798,7 +1882,10 @@ export default function AdminDashboard() {
                                             </div>
                                         </CardContent>
                                     </Card>
+                                    </SortableProjectCard>
                                 ))}
+                                    </SortableContext>
+                                </DndContext>
                             </div>
                         </TabsContent>
 
@@ -1836,11 +1923,20 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
 
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleExperienceDragEnd}>
+                                    <SortableContext
+                                        items={editedData.experience.map((e) => e.id)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
                                 {editedData.experience.map((exp, index) => (
-                                    <Card key={exp.id} className="bg-card text-card-foreground border-border">
+                                    <SortableExperienceCard key={exp.id} id={exp.id}>
+                                    <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <div className="flex items-center justify-between">
-                                                <CardTitle className="text-base">Experience {index + 1}</CardTitle>
+                                                <div className="flex items-center gap-2">
+                                                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                                                    <CardTitle className="text-base">Experience {index + 1}</CardTitle>
+                                                </div>
                                                 <Button
                                                     onClick={() => removeExperience(exp.id)}
                                                     variant="outline"
@@ -2070,7 +2166,10 @@ export default function AdminDashboard() {
                                             </div>
                                         </CardContent>
                                     </Card>
+                                    </SortableExperienceCard>
                                 ))}
+                                    </SortableContext>
+                                </DndContext>
                             </div>
                         </TabsContent>
 
@@ -2582,6 +2681,61 @@ export default function AdminDashboard() {
 
                                 {/* Skills Section */}
 
+                            </div>
+                        </TabsContent>
+
+                        {/* Blog Section */}
+                        <TabsContent value="blog">
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-lg font-semibold">Blog</h3>
+                                        <p className="text-sm text-muted-foreground">Configure your Hashnode blog integration</p>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => toggleSectionVisibility("blog")}
+                                        className={sectionOrder.blog === 0 ? "text-green-600" : "text-red-600"}
+                                    >
+                                        {sectionOrder.blog === 0 ? (
+                                            <>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                Show Section
+                                            </>
+                                        ) : (
+                                            <>
+                                                <EyeOff className="mr-2 h-4 w-4" />
+                                                Hide Section
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+
+                                <Card className="bg-card text-card-foreground border-border">
+                                    <CardHeader>
+                                        <CardTitle>Hashnode Configuration</CardTitle>
+                                        <CardDescription>
+                                            Enter your Hashnode blog URL to fetch and display your blog posts on the portfolio.
+                                            Blog posts are fetched automatically — no manual entry needed.
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="hashnode-host">Hashnode Blog URL</Label>
+                                            <Input
+                                                id="hashnode-host"
+                                                value={editedData.blog?.hashnodeHost || ""}
+                                                onChange={(e) => updateField(["blog", "hashnodeHost"], e.target.value)}
+                                                className="bg-background border-input"
+                                                placeholder="e.g., yourusername.hashnode.dev"
+                                            />
+                                            <p className="text-xs text-muted-foreground">
+                                                Your Hashnode publication host (e.g., <code className="text-primary">eahtasham.hashnode.dev</code> or a custom domain like <code className="text-primary">blog.yourdomain.com</code>)
+                                            </p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             </div>
                         </TabsContent>
 

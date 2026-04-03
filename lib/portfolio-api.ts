@@ -61,7 +61,8 @@ const defaultData: PortfolioData = {
     experience: 4,
     skills: 5,
     education: 6,
-    contacts: 7
+    contacts: 7,
+    blog: 8,
   },
   hero: {
     heading: "Hi, I'm Eahtasham",
@@ -111,6 +112,9 @@ const defaultData: PortfolioData = {
     twitter: "https://twitter.com/johndoe",
     github: "https://github.com/johndoe",
     linkedin: "https://linkedin.com/in/johndoe",
+  },
+  blog: {
+    hashnodeHost: "eahtasham.hashnode.dev",
   },
 };
 

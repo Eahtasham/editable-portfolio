@@ -20,6 +20,7 @@ export interface PortfolioData {
     skills: number;
     education: number;
     contacts: number;
+    blog: number;
   };
   hero: {
     heading: string;
@@ -135,6 +136,9 @@ export interface PortfolioData {
     discord?: string;
     telegram?: string;
   };
+  blog: {
+    hashnodeHost: string;
+  };
 }
 
 interface PortfolioContextType {
@@ -160,7 +164,21 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
   const [data, setData] = useState<PortfolioData>(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const stored = localStorage.getItem("portfolio_auth");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Check if token hasn't expired (24 hours)
+        if (parsed.expiry && Date.now() < parsed.expiry) {
+          return true;
+        }
+        localStorage.removeItem("portfolio_auth");
+      }
+    } catch {}
+    return false;
+  });
 
   const refreshData = async () => {
     setLoading(true);
@@ -254,6 +272,12 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
 
     if (email === adminEmail && password === adminPassword) {
       setIsAuthenticated(true);
+      try {
+        localStorage.setItem("portfolio_auth", JSON.stringify({
+          authenticated: true,
+          expiry: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+        }));
+      } catch {}
       return true;
     }
     return false;
@@ -261,6 +285,9 @@ export const PortfolioProvider = ({ children, initialData }: PortfolioProviderPr
 
   const logout = () => {
     setIsAuthenticated(false);
+    try {
+      localStorage.removeItem("portfolio_auth");
+    } catch {}
   };
 
   // Apply theme on mount
