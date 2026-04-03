@@ -8,6 +8,7 @@ import { ExperienceSection } from "./sections/ExperienceSection"
 import { EducationSection } from "./sections/EducationSection"
 import { SkillsSection } from "./sections/SkillsSection"
 import { ContactSection } from "./sections/ContactSection"
+import { BlogSection } from "./sections/BlogSection"
 import { Nav } from "./Nav"
 import { Footer } from "./Footer"
 import { ParticleBackground } from "./particle-background"
@@ -31,6 +32,7 @@ export default function HomePage() {
     education: <EducationSection key="education" />,
     skills: <SkillsSection key="skills" />,
     contacts: <ContactSection key="contacts" />,
+    blog: <BlogSection key="blog" />,
   }
 
   // Filter out sections with order 0
