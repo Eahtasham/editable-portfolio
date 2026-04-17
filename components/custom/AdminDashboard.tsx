@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Input as OriginalInput } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea as OriginalTextarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -44,6 +44,82 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { formatHex, converter } from "culori"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
+
+const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = ({ value: initialValue, onChange, onBlur, ...props }: any) => {
+    const isControlled = initialValue !== undefined;
+    const [value, setValue] = useState(initialValue || "");
+    
+    useEffect(() => {
+        if (isControlled) {
+            setValue(initialValue);
+        }
+    }, [initialValue, isControlled]);
+
+    useEffect(() => {
+        if (!isControlled) return;
+        const timeout = setTimeout(() => {
+            if (value !== initialValue && onChange) {
+                onChange({ target: { value }, currentTarget: { value } } as any);
+            }
+        }, 300);
+        return () => clearTimeout(timeout);
+    }, [value, initialValue, onChange, isControlled]);
+
+    return (
+        <OriginalInput 
+            {...props} 
+            value={isControlled ? value : undefined} 
+            onChange={e => {
+                if (isControlled) setValue(e.target.value);
+                if (onChange && !isControlled) onChange(e);
+            }} 
+            onBlur={e => {
+                if (onBlur) onBlur(e);
+                if (isControlled && value !== initialValue && onChange) {
+                    onChange(e);
+                }
+            }}
+        />
+    )
+}
+
+const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ value: initialValue, onChange, onBlur, ...props }: any) => {
+    const isControlled = initialValue !== undefined;
+    const [value, setValue] = useState(initialValue || "");
+    
+    useEffect(() => {
+        if (isControlled) {
+            setValue(initialValue);
+        }
+    }, [initialValue, isControlled]);
+
+    useEffect(() => {
+        if (!isControlled) return;
+        const timeout = setTimeout(() => {
+            if (value !== initialValue && onChange) {
+                onChange({ target: { value }, currentTarget: { value } } as any);
+            }
+        }, 300);
+        return () => clearTimeout(timeout);
+    }, [value, initialValue, onChange, isControlled]);
+
+    return (
+        <OriginalTextarea 
+            {...props} 
+            value={isControlled ? value : undefined} 
+            onChange={e => {
+                if (isControlled) setValue(e.target.value);
+                if (onChange && !isControlled) onChange(e);
+            }} 
+            onBlur={e => {
+                if (onBlur) onBlur(e);
+                if (isControlled && value !== initialValue && onChange) {
+                    onChange(e);
+                }
+            }}
+        />
+    )
+}
 
 // Color conversion utilities using culori
 const hexToOklch = (hex: string): string => {
@@ -153,7 +229,7 @@ const SortableItem: React.FC<SortableItemProps> = ({ id, section, order, isHidde
 }
 
 // Sortable wrapper for project cards
-const SortableProjectCard: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+const SortableProjectCard: React.FC<{ id: string; children: (dragProps: { listeners: any; attributes: any }) => React.ReactNode }> = ({ id, children }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -164,14 +240,14 @@ const SortableProjectCard: React.FC<{ id: string; children: React.ReactNode }> =
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            {children}
+        <div ref={setNodeRef} style={style}>
+            {children({ listeners, attributes })}
         </div>
     )
 }
 
 // Sortable wrapper for experience cards
-const SortableExperienceCard: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+const SortableExperienceCard: React.FC<{ id: string; children: (dragProps: { listeners: any; attributes: any }) => React.ReactNode }> = ({ id, children }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -182,8 +258,8 @@ const SortableExperienceCard: React.FC<{ id: string; children: React.ReactNode }
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            {children}
+        <div ref={setNodeRef} style={style}>
+            {children({ listeners, attributes })}
         </div>
     )
 }
@@ -1679,11 +1755,14 @@ export default function AdminDashboard() {
                                     >
                                 {editedData.projects.map((project, index) => (
                                     <SortableProjectCard key={project.id} id={project.id}>
+                                        {({ listeners, attributes }) => (
                                     <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                                                    <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing flex items-center justify-center">
+                                                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                                    </div>
                                                     <CardTitle className="text-base">Project {index + 1}</CardTitle>
                                                 </div>
                                                 <Button
@@ -1882,6 +1961,7 @@ export default function AdminDashboard() {
                                             </div>
                                         </CardContent>
                                     </Card>
+                                        )}
                                     </SortableProjectCard>
                                 ))}
                                     </SortableContext>
@@ -1930,11 +2010,14 @@ export default function AdminDashboard() {
                                     >
                                 {editedData.experience.map((exp, index) => (
                                     <SortableExperienceCard key={exp.id} id={exp.id}>
+                                        {({ listeners, attributes }) => (
                                     <Card className="bg-card text-card-foreground border-border">
                                         <CardHeader>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                                                    <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing flex items-center justify-center">
+                                                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                                    </div>
                                                     <CardTitle className="text-base">Experience {index + 1}</CardTitle>
                                                 </div>
                                                 <Button
@@ -2166,6 +2249,7 @@ export default function AdminDashboard() {
                                             </div>
                                         </CardContent>
                                     </Card>
+                                        )}
                                     </SortableExperienceCard>
                                 ))}
                                     </SortableContext>
